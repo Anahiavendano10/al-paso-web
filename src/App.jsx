@@ -91,7 +91,24 @@ export default function App() {
       setProducts(products.map(p => p.id === id ? { ...p, available: !p.available } : p));
     }
   };
+// 🔴 REEMPLAZA ESTE NÚMERO CON TU WHATSAPP REAL (formato internacional sin signo +)
+  const PHONE_NUMBER = "5493884718946"; 
 
+  const handleSendWhatsApp = () => {
+    if (cart.length === 0) return;
+
+    let message = `*¡Hola AL PASO! Quiero realizar el siguiente pedido:*\n\n`;
+
+    cart.forEach((item) => {
+      message += `• *${item.name}* (x${item.quantity}) - $${item.totalPrice}\n`;
+    });
+
+    message += `\n*Total a pagar: $${totalCartPrice}*`;
+    message += `\n\nQuedo a la espera de la confirmación. ¡Muchas gracias!`;
+
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`, '_blank');
+  };
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
@@ -373,12 +390,11 @@ export default function App() {
               <span>Total</span>
               <span>${totalCartPrice}</span>
             </div>
-
             <button
-              onClick={() => alert('¡Pedido enviado!')}
-              className="w-full bg-emerald-500 text-white py-3 rounded-2xl font-black text-xs"
+              onClick={handleSendWhatsApp}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-2xl font-black text-xs transition-all active:scale-95"
             >
-              Continuar con el pedido
+              Continuar con el pedido en WhatsApp
             </button>
           </div>
         </div>
