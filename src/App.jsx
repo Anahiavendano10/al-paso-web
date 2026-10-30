@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Settings, Power 
+  MapPin, Settings, Power, Info, Instagram, Facebook 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -19,6 +19,7 @@ export default function App() {
 
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
@@ -68,8 +69,8 @@ export default function App() {
   const openProductDetail = (prod) => {
     if (!prod.available) return;
     setSelectedProduct(prod);
-    setProductQuantity(0); // Empieza en 0
-    setProductNotes('');    // Limpia las notas de sándwich
+    setProductQuantity(0);
+    setProductNotes('');
   };
 
   const addToCart = () => {
@@ -124,7 +125,16 @@ export default function App() {
 
       {/* HEADER */}
       <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30">
-        <h1 className="text-lg font-black tracking-tight text-gray-900">AL PASO</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsInfoModalOpen(true)}
+            className="p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-all"
+            title="Información del local"
+          >
+            <Info size={20} />
+          </button>
+          <h1 className="text-lg font-black tracking-tight text-gray-900">AL PASO</h1>
+        </div>
 
         <div className="flex items-center gap-2">
           {isAdmin ? (
@@ -174,10 +184,16 @@ export default function App() {
 
       {/* DETALLE LOCAL */}
       <div className="max-w-md mx-auto -mt-6 px-4 relative z-10">
-        <div className="bg-white rounded-2xl p-4 shadow-md space-y-2 border border-gray-100">
-          <div className="flex items-center gap-2 text-xs font-bold text-gray-800">
-            <MapPin size={14} className="text-red-500" />
-            <span>Local AL PASO</span>
+        <div 
+          onClick={() => setIsInfoModalOpen(true)}
+          className="bg-white rounded-2xl p-4 shadow-md space-y-2 border border-gray-100 cursor-pointer hover:bg-gray-50/80 transition-all"
+        >
+          <div className="flex items-center justify-between text-xs font-bold text-gray-800">
+            <div className="flex items-center gap-2">
+              <MapPin size={14} className="text-red-500" />
+              <span>Av. Principal #123, Tu Ciudad</span>
+            </div>
+            <span className="text-[10px] text-gray-400 font-medium">Ver más info &gt;</span>
           </div>
 
           <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-100">
@@ -319,6 +335,89 @@ export default function App() {
             </div>
             <span>${totalCartPrice}</span>
           </button>
+        </div>
+      )}
+
+      {/* MODAL DE INFORMACIÓN DEL LOCAL */}
+      {isInfoModalOpen && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
+            <button
+              onClick={() => setIsInfoModalOpen(false)}
+              className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200"
+            >
+              <X size={18} />
+            </button>
+
+            {/* Logo y Encabezado */}
+            <div className="text-center space-y-2 mb-6">
+              <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto text-xl font-black shadow-md">
+                AP
+              </div>
+              <h2 className="text-xl font-black text-gray-900">AL PASO</h2>
+              <p className="text-xs text-gray-500">Empanadería y Sandwichería</p>
+            </div>
+
+            {/* Sobre Nosotros */}
+            <div className="space-y-4 text-xs border-t border-gray-100 pt-4">
+              <div>
+                <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-1">Sobre Nosotros</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Ofrecemos las mejores empanadas artesanales cortadas a cuchillo y sándwiches completos preparados en el momento. ¡Ingredientes frescos y el verdadero sabor de casa!
+                </p>
+              </div>
+
+              {/* Horarios de Atención */}
+              <div>
+                <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Horarios de Atención</h3>
+                <div className="bg-gray-50 p-3 rounded-2xl space-y-1 text-gray-600 font-medium">
+                  <div className="flex justify-between"><span>Lunes - Viernes</span> <span className="font-bold text-gray-900">11:00 - 23:00</span></div>
+                  <div className="flex justify-between"><span>Sábados</span> <span className="font-bold text-gray-900">12:00 - 00:00</span></div>
+                  <div className="flex justify-between"><span>Domingos</span> <span className="font-bold text-gray-900">12:00 - 23:00</span></div>
+                </div>
+              </div>
+
+              {/* Redes Sociales */}
+              <div>
+                <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
+                <div className="flex gap-3">
+                  <a href="#" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
+                    <Instagram size={14} /> Instagram
+                  </a>
+                  <a href="#" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
+                    <Facebook size={14} /> Facebook
+                  </a>
+                </div>
+              </div>
+
+              {/* Ubicación / Mapa Integrado */}
+              <div>
+                <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
+                <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+                  <iframe
+                    title="Ubicacion AL PASO"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.0168878205126!2d-58.381592!3d-34.603722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDM2JzEzLjQiUyA1OMKwMjInNTMuNyJX!5e0!3m2!1ses!2sar!4v1620000000000!5m2!1ses!2sar"
+                    width="100%"
+                    height="160"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                  ></iframe>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-[11px] text-gray-500 font-medium">Av. Principal #123, Tu Ciudad</span>
+                  <a
+                    href="https://maps.google.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-bold text-blue-600 hover:underline"
+                  >
+                    Abrir en Maps
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
