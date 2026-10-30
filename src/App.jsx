@@ -20,7 +20,11 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [productQuantity, setProductQuantity] = useState(1);
+  const [productQuantity, setProductQuantity] = useState(0);
+  const [productNotes, setProductNotes] = useState('');
+
+  // 🔴 REEMPLAZA CON TU NÚMERO DE WHATSAPP REAL (sin signo + ni espacios)
+  const PHONE_NUMBER = "5491112345678";
 
   useEffect(() => {
     fetchProducts();
@@ -64,17 +68,21 @@ export default function App() {
   const openProductDetail = (prod) => {
     if (!prod.available) return;
     setSelectedProduct(prod);
-    setProductQuantity(1);
+    setProductQuantity(0); // Empieza en 0
+    setProductNotes('');    // Limpia las notas de sándwich
   };
 
   const addToCart = () => {
-    if (!selectedProduct) return;
+    if (!selectedProduct || productQuantity <= 0) return;
+
     const itemToAdd = {
       ...selectedProduct,
       cartId: Date.now(),
       quantity: productQuantity,
+      notes: selectedProduct.category === 'Sandwiches' ? productNotes : '',
       totalPrice: selectedProduct.price * productQuantity
     };
+
     setCart([...cart, itemToAdd]);
     setSelectedProduct(null);
   };
@@ -91,8 +99,6 @@ export default function App() {
       setProducts(products.map(p => p.id === id ? { ...p, available: !p.available } : p));
     }
   };
-// 🔴 REEMPLAZA ESTE NÚMERO CON TU WHATSAPP REAL (formato internacional sin signo +)
-  const PHONE_NUMBER = "5493884718946"; 
 
   const handleSendWhatsApp = () => {
     if (cart.length === 0) return;
@@ -101,6 +107,9 @@ export default function App() {
 
     cart.forEach((item) => {
       message += `• *${item.name}* (x${item.quantity}) - $${item.totalPrice}\n`;
+      if (item.notes) {
+        message += `   _Detalle: ${item.notes}_\n`;
+      }
     });
 
     message += `\n*Total a pagar: $${totalCartPrice}*`;
@@ -109,6 +118,7 @@ export default function App() {
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`, '_blank');
   };
+
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
@@ -239,7 +249,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* LISTA DE PRODUCTOS (USA name, description e image) */}
+      {/* LISTA DE PRODUCTOS */}
       <div className="max-w-md mx-auto px-4 mt-4 space-y-3">
         {loading ? (
           <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
@@ -294,7 +304,7 @@ export default function App() {
         )}
       </div>
 
-      {/* CARRITO INFERIOR */}
+      {/* BARRA INFERIOR DE MI PEDIDO */}
       {cart.length > 0 && (
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
@@ -312,115 +322,113 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DETALLE */}
       {/* MODAL DETALLE DE PRODUCTO */}
-      {/* MODAL DETALLE DE PRODUCTO */}
-{selectedProduct && (
-  <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
-    <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
-      <button
-        onClick={() => setSelectedProduct(null)}
-        className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 transition-all"
-      >
-        <X size={18} />
-      </button>
-
-      {/* Imagen del Producto */}
-      <div className="h-40 bg-gray-100 rounded-2xl overflow-hidden mb-4">
-        <img
-          src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
-          alt={selectedProduct.name}
-          className="w-full h-full object-cover"
-        />
-      </div>
-
-      <h3 className="text-lg font-black">{selectedProduct.name}</h3>
-      <p className="text-xs text-gray-500 mt-1">{selectedProduct.description || selectedProduct.category}</p>
-
-      {/* 1. SELECCIÓN RÁPIDA (SOLO PARA EMPANADAS) */}
-      {selectedProduct.category === 'Empanadas' && (
-        <div className="mt-4 pt-3 border-t border-gray-100">
-          <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
-          <div className="grid grid-cols-3 gap-2">
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
             <button
-              type="button"
-              onClick={() => setProductQuantity(productQuantity + 1)}
-              className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
+              onClick={() => setSelectedProduct(null)}
+              className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 transition-all"
             >
-              +1 Unidad
+              <X size={18} />
             </button>
-            <button
-              type="button"
-              onClick={() => setProductQuantity(productQuantity + 6)}
-              className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
-            >
-              +1/2 Docena
-            </button>
-            <button
-              type="button"
-              onClick={() => setProductQuantity(productQuantity + 12)}
-              className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
-            >
-              +1 Docena
-            </button>
+
+            <div className="h-40 bg-gray-100 rounded-2xl overflow-hidden mb-4">
+              <img
+                src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
+                alt={selectedProduct.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <h3 className="text-lg font-black">{selectedProduct.name}</h3>
+            <p className="text-xs text-gray-500 mt-1">{selectedProduct.description || selectedProduct.category}</p>
+
+            {/* SELECCIÓN RÁPIDA (SOLO EMPANADAS) */}
+            {selectedProduct.category === 'Empanadas' && (
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setProductQuantity(productQuantity + 1)}
+                    className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
+                  >
+                    +1 Unidad
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProductQuantity(productQuantity + 6)}
+                    className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
+                  >
+                    +1/2 Docena
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setProductQuantity(productQuantity + 12)}
+                    className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
+                  >
+                    +1 Docena
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* NOTAS (SOLO SANDWICHES) */}
+            {selectedProduct.category === 'Sandwiches' && (
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Aderezos y verduras adicionales:
+                </label>
+                <textarea
+                  rows="2"
+                  placeholder="Ej: Con mayo, sin cebolla, agregar tomate extra..."
+                  value={productNotes}
+                  onChange={(e) => setProductNotes(e.target.value)}
+                  className="w-full p-2.5 border border-gray-200 rounded-xl text-xs font-medium focus:border-black outline-none resize-none bg-gray-50"
+                />
+              </div>
+            )}
+
+            {/* CONTADOR DE UNIDADES Y BOTÓN AÑADIR */}
+            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+              <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl">
+                <button 
+                  type="button" 
+                  onClick={() => setProductQuantity(Math.max(0, productQuantity - 1))}
+                  className="p-1 font-bold text-gray-700 hover:text-black"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="font-extrabold text-sm min-w-[20px] text-center">{productQuantity}</span>
+                <button 
+                  type="button" 
+                  onClick={() => setProductQuantity(productQuantity + 1)}
+                  className="p-1 font-bold text-gray-700 hover:text-black"
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={addToCart}
+                disabled={productQuantity === 0}
+                className={`px-6 py-3 rounded-2xl font-black text-xs flex gap-2 transition-all ${
+                  productQuantity > 0 
+                    ? 'bg-black hover:bg-gray-800 text-white cursor-pointer active:scale-95 shadow-md' 
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <span>Añadir</span>
+                <span>${selectedProduct.price * productQuantity}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* 2. DETALLES DE ADEREZOS Y VERDURAS (SOLO PARA SANDWICHES) */}
-      {selectedProduct.category === 'Sandwiches' && (
-        <div className="mt-4 pt-3 border-t border-gray-100">
-          <label className="block text-xs font-bold text-gray-700 mb-1.5">
-            Aderezos y verduras adicionales:
-          </label>
-          <textarea
-            rows="2"
-            placeholder="Ej: Con mayo, sin cebolla, agregar tomate extra..."
-            value={productNotes || ''}
-            onChange={(e) => setProductNotes(e.target.value)}
-            className="w-full p-2.5 border border-gray-200 rounded-xl text-xs font-medium focus:border-black outline-none resize-none bg-gray-50"
-          />
-        </div>
-      )}
-
-      {/* CONTADOR DE UNIDADES Y BOTÓN AÑADIR (COMÚN A TODOS) */}
-      <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-        <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl">
-          <button 
-            type="button" 
-            onClick={() => setProductQuantity(Math.max(0, productQuantity - 1))}
-            className="p-1 font-bold text-gray-700 hover:text-black"
-          >
-            <Minus size={14} />
-          </button>
-          <span className="font-extrabold text-sm min-w-[20px] text-center">{productQuantity}</span>
-          <button 
-            type="button" 
-            onClick={() => setProductQuantity(productQuantity + 1)}
-            className="p-1 font-bold text-gray-700 hover:text-black"
-          >
-            <Plus size={14} />
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={addToCart}
-          disabled={productQuantity === 0}
-          className={`px-6 py-3 rounded-2xl font-black text-xs flex gap-2 transition-all ${
-            productQuantity > 0 
-              ? 'bg-black hover:bg-gray-800 text-white cursor-pointer active:scale-95 shadow-md' 
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          <span>Añadir</span>
-          <span>${selectedProduct.price * productQuantity}</span>
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-      {/* MODAL PEDIDO */}
+      {/* MODAL CARRITO / WHATSAPP */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
@@ -439,6 +447,7 @@ export default function App() {
                   <div key={item.cartId} className="py-3 flex justify-between items-center">
                     <div>
                       <p className="font-extrabold text-xs">{item.name} (x{item.quantity})</p>
+                      {item.notes && <p className="text-[10px] text-gray-500 italic">Notas: {item.notes}</p>}
                       <p className="text-[10px] text-gray-400">${item.totalPrice}</p>
                     </div>
                     <button onClick={() => removeFromCart(item.cartId)} className="text-red-500 p-1">
@@ -453,6 +462,7 @@ export default function App() {
               <span>Total</span>
               <span>${totalCartPrice}</span>
             </div>
+
             <button
               onClick={handleSendWhatsApp}
               className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-2xl font-black text-xs transition-all active:scale-95"
@@ -463,7 +473,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL PIN */}
+      {/* MODAL PIN ADMIN */}
       {isPinModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl">
