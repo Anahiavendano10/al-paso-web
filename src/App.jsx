@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Settings, Power, Info, Instagram, Facebook 
+  MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Bike, ShoppingPack 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -26,6 +26,9 @@ export default function App() {
 
   // 🔴 REEMPLAZA CON TU NÚMERO DE WHATSAPP REAL (sin signo + ni espacios)
   const PHONE_NUMBER = "5491112345678";
+
+  // 🔴 REEMPLAZA CON TU ENLACE DE GOOGLE MAPS REAL
+  const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
 
   useEffect(() => {
     fetchProducts();
@@ -123,43 +126,46 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
-      {/* HEADER */}
-      <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setIsInfoModalOpen(true)}
-            className="p-2 text-gray-700 hover:bg-gray-100 rounded-full transition-all"
-            title="Información del local"
-          >
-            <Info size={20} />
-          </button>
-          <h1 className="text-lg font-black tracking-tight text-gray-900">AL PASO</h1>
+      {/* HEADER IDÉNTICO A LA CAPTURA */}
+      <header className="bg-white px-5 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
+        <button
+          onClick={() => setIsInfoModalOpen(true)}
+          className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-full transition-all"
+        >
+          <Menu size={22} />
+        </button>
+
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-xl font-black tracking-wider text-black">AL PASO</h1>
+          <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#83c613]' : 'bg-red-500'}`} />
         </div>
 
         <div className="flex items-center gap-2">
           {isAdmin ? (
             <button
               onClick={handleLogout}
-              className="bg-black text-white px-3 py-1.5 rounded-full font-bold text-xs flex items-center gap-1"
+              className="bg-black text-white p-1.5 rounded-full"
+              title="Salir de Modo Admin"
             >
-              <LogOut size={12} /> Salir Admin
+              <LogOut size={18} />
             </button>
           ) : (
             <button
               onClick={() => setIsPinModalOpen(true)}
-              className="p-2 text-gray-700 hover:bg-gray-100 rounded-full"
+              className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full"
+              title="Acceso Administración"
             >
-              <Lock size={18} />
+              <Settings size={20} />
             </button>
           )}
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className="p-2 text-gray-700 hover:bg-gray-100 rounded-full relative"
+            className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-full relative"
           >
-            <ShoppingBag size={20} />
+            <ShoppingBag size={22} />
             {cart.length > 0 && (
-              <span className="absolute top-1 right-1 bg-black text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-0 right-0 bg-black text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
                 {cart.length}
               </span>
             )}
@@ -167,56 +173,76 @@ export default function App() {
         </div>
       </header>
 
-      {/* PORTADA */}
-      <div className="relative h-44 bg-slate-900 overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=800&auto=format&fit=crop"
-          alt="Portada AL PASO"
-          className="w-full h-full object-cover opacity-60"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-4">
-          <div className="text-white">
-            <h2 className="text-2xl font-black">AL PASO</h2>
-            <p className="text-xs text-gray-300">Empanadería y Sandwichería</p>
+      {/* CONTENEDOR PRINCIPAL DE PORTADA Y TARJETA FLOTANTE */}
+      <div className="max-w-md mx-auto px-3 mt-3">
+        <div className="relative rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-[#16202c]">
+          {/* Imagen de fondo de la portada */}
+          <div className="h-56 relative overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
+              alt="Portada AL PASO"
+              className="w-full h-full object-cover opacity-80"
+            />
+            <div className="absolute inset-0 bg-black/20" />
+          </div>
+
+          {/* TARJETA BLANCA SOBREPUESTA IDÉNTICA A LA IMAGEN */}
+          <div className="p-3 bg-transparent -mt-24 relative z-10">
+            <div className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100/80 space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-black text-black tracking-tight">AL PASO</h2>
+                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-0.5">
+                    EMPANADERÍA Y SÁNDWICHERÍA
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setIsInfoModalOpen(true)}
+                  className="text-[#83c613] p-1 hover:bg-lime-50 rounded-full transition-all"
+                >
+                  <Info size={24} />
+                </button>
+              </div>
+
+              {/* Dirección con ícono verde */}
+              <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold pt-0.5">
+                <MapPin size={16} className="text-[#83c613] shrink-0" />
+                <span>Av. Corrientes 1234, Buenos Aires</span>
+              </div>
+
+              {/* Estado y etiquetas Delivery / Retiro */}
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#83c613]' : 'bg-red-500'}`} />
+                  <span className="font-bold text-xs text-black">
+                    {isOpenLocal ? 'Abierto' : 'Cerrado'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                    🛵 Delivery
+                  </span>
+                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                    🛍️ Retiro
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* DETALLE LOCAL */}
-      <div className="max-w-md mx-auto -mt-6 px-4 relative z-10">
-        <div 
-          onClick={() => setIsInfoModalOpen(true)}
-          className="bg-white rounded-2xl p-4 shadow-md space-y-2 border border-gray-100 cursor-pointer hover:bg-gray-50/80 transition-all"
-        >
-          <div className="flex items-center justify-between text-xs font-bold text-gray-800">
-            <div className="flex items-center gap-2">
-              <MapPin size={14} className="text-red-500" />
-              <span>Av. Principal #123, Tu Ciudad</span>
-            </div>
-            <span className="text-[10px] text-gray-400 font-medium">Ver más info &gt;</span>
-          </div>
-
-          <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-100">
-            <div className="flex items-center gap-1.5 font-bold">
-              <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span className={isOpenLocal ? 'text-green-700' : 'text-red-600'}>
-                {isOpenLocal ? 'Abierto' : 'Cerrado'}
-              </span>
-            </div>
-            <span className="text-gray-500">Delivery disponible</span>
-          </div>
-        </div>
-      </div>
-
-      {/* CONTROL ADMIN */}
+      {/* PANEL DE MODO ADMIN */}
       {isAdmin && (
-        <div className="max-w-md mx-auto px-4 mt-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex justify-between items-center">
+        <div className="max-w-md mx-auto px-3 mt-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center">
             <div>
               <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
                 <Settings size={14} /> Modo Administrador
               </span>
-              <p className="text-[10px] text-amber-700">Agotar productos o cambiar horario</p>
+              <p className="text-[10px] text-amber-700">Cambia horario o marca productos agotados</p>
             </div>
 
             <button
@@ -233,7 +259,7 @@ export default function App() {
       )}
 
       {/* BÚSQUEDA */}
-      <div className="max-w-md mx-auto px-4 mt-4">
+      <div className="max-w-md mx-auto px-3 mt-4">
         <div className="bg-white rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-sm border border-gray-100">
           <Search size={18} className="text-gray-400" />
           <input
@@ -247,7 +273,7 @@ export default function App() {
       </div>
 
       {/* CATEGORÍAS */}
-      <div className="max-w-md mx-auto px-4 mt-4">
+      <div className="max-w-md mx-auto px-3 mt-3">
         <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           {categories.map((cat) => (
             <button
@@ -266,7 +292,7 @@ export default function App() {
       </div>
 
       {/* LISTA DE PRODUCTOS */}
-      <div className="max-w-md mx-auto px-4 mt-4 space-y-3">
+      <div className="max-w-md mx-auto px-3 mt-4 space-y-3">
         {loading ? (
           <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
         ) : filteredProducts.length === 0 ? (
@@ -349,7 +375,6 @@ export default function App() {
               <X size={18} />
             </button>
 
-            {/* Logo y Encabezado */}
             <div className="text-center space-y-2 mb-6">
               <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center mx-auto text-xl font-black shadow-md">
                 AP
@@ -358,7 +383,6 @@ export default function App() {
               <p className="text-xs text-gray-500">Empanadería y Sandwichería</p>
             </div>
 
-            {/* Sobre Nosotros */}
             <div className="space-y-4 text-xs border-t border-gray-100 pt-4">
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-1">Sobre Nosotros</h3>
@@ -367,17 +391,22 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Horarios de Atención */}
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Horarios de Atención</h3>
-                <div className="bg-gray-50 p-3 rounded-2xl space-y-1 text-gray-600 font-medium">
-                  <div className="flex justify-between"><span>Lunes - Viernes</span> <span className="font-bold text-gray-900">11:00 - 23:00</span></div>
-                  <div className="flex justify-between"><span>Sábados</span> <span className="font-bold text-gray-900">12:00 - 00:00</span></div>
-                  <div className="flex justify-between"><span>Domingos</span> <span className="font-bold text-gray-900">12:00 - 23:00</span></div>
+                <div className="bg-gray-50 p-3 rounded-2xl space-y-2 text-gray-600 font-medium text-[11px]">
+                  <div className="flex justify-between items-center border-b border-gray-200/60 pb-1.5">
+                    <span>Lunes a Sábado</span> 
+                    <span className="font-bold text-gray-900 text-right">
+                      10:00 - 16:00<br />19:00 - 00:30
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center pt-0.5">
+                    <span>Domingos</span> 
+                    <span className="font-bold text-gray-900">10:00 - 16:00</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Redes Sociales */}
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
                 <div className="flex gap-3">
@@ -390,29 +419,20 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Ubicación / Mapa Integrado */}
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
-                <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
-                  <iframe
-                    title="Ubicacion AL PASO"
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.0168878205126!2d-58.381592!3d-34.603722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDM2JzEzLjQiUyA1OMKwMjInNTMuNyJX!5e0!3m2!1ses!2sar!4v1620000000000!5m2!1ses!2sar"
-                    width="100%"
-                    height="160"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    loading="lazy"
-                  ></iframe>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  <span className="text-[11px] text-gray-500 font-medium">Av. Principal #123, Tu Ciudad</span>
+                <div className="bg-gray-50 p-3 rounded-2xl space-y-2">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-[#83c613] shrink-0" />
+                    <span className="text-xs font-bold text-gray-800">Av. Corrientes 1234, Buenos Aires</span>
+                  </div>
                   <a
-                    href="https://maps.google.com"
+                    href={MAPS_LINK}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[11px] font-bold text-blue-600 hover:underline"
+                    className="block w-full text-center bg-black text-white py-2 rounded-xl font-bold text-xs hover:bg-gray-800 transition-all active:scale-95"
                   >
-                    Abrir en Maps
+                    Abrir ubicación en Google Maps 📍
                   </a>
                 </div>
               </div>
@@ -443,7 +463,6 @@ export default function App() {
             <h3 className="text-lg font-black">{selectedProduct.name}</h3>
             <p className="text-xs text-gray-500 mt-1">{selectedProduct.description || selectedProduct.category}</p>
 
-            {/* SELECCIÓN RÁPIDA (SOLO EMPANADAS) */}
             {selectedProduct.category === 'Empanadas' && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
@@ -473,7 +492,6 @@ export default function App() {
               </div>
             )}
 
-            {/* NOTAS (SOLO SANDWICHES) */}
             {selectedProduct.category === 'Sandwiches' && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <label className="block text-xs font-bold text-gray-700 mb-1.5">
@@ -489,7 +507,6 @@ export default function App() {
               </div>
             )}
 
-            {/* CONTADOR DE UNIDADES Y BOTÓN AÑADIR */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl">
                 <button 
