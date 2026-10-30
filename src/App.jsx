@@ -1,44 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Clock, Phone, Settings, Power, Trash2, Edit3, Save 
+  MapPin, Settings, Power 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
 export default function App() {
-  // --- ESTADOS DE AUTENTICACIÓN ADMIN ---
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
   const [pin, setPin] = useState('');
   const [pinError, setPinError] = useState('');
 
-  // --- ESTADOS DE LA TIENDA Y MENÚ ---
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isOpenLocal, setIsOpenLocal] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
-  // --- CARRITO Y MODALES ---
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productQuantity, setProductQuantity] = useState(1);
-  const [selectedExtras, setSelectedExtras] = useState([]);
 
-  // --- FORMULARIO ADMIN ---
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [newCategory, setNewCategory] = useState('Empanadas');
-  const [editingId, setEditingId] = useState(null);
-  const [editPrice, setEditPrice] = useState('');
-
-  // Cargar datos
   useEffect(() => {
     fetchProducts();
-    const adminActive = localStorage.getItem('alpaso_admin_active');
-    if (adminActive === 'true') {
+    if (localStorage.getItem('alpaso_admin_active') === 'true') {
       setIsAdmin(true);
     }
   }, []);
@@ -50,7 +36,6 @@ export default function App() {
     setLoading(false);
   };
 
-  // Login de Admin con PIN
   const handlePinSubmit = (e) => {
     e.preventDefault();
     if (pin === '2026') {
@@ -69,19 +54,17 @@ export default function App() {
     setIsAdmin(false);
   };
 
-  // Filtrado de productos
   const categories = ['Todos', 'Empanadas', 'Sandwiches', 'Bebidas'];
   const filteredProducts = products.filter(p => {
-    const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;
     return matchesSearch && matchesCat;
   });
 
-  // Funciones de Carrito
   const openProductDetail = (prod) => {
+    if (!prod.available) return;
     setSelectedProduct(prod);
     setProductQuantity(1);
-    setSelectedExtras([]);
   };
 
   const addToCart = () => {
@@ -102,7 +85,6 @@ export default function App() {
 
   const totalCartPrice = cart.reduce((acc, item) => acc + item.totalPrice, 0);
 
-  // Funciones CRUD Admin
   const toggleAvailable = async (id, currentStatus) => {
     const { error } = await supabase.from('products').update({ available: !currentStatus }).eq('id', id);
     if (!error) {
@@ -110,44 +92,12 @@ export default function App() {
     }
   };
 
-  const savePrice = async (id) => {
-    const { error } = await supabase.from('products').update({ price: parseFloat(editPrice) }).eq('id', id);
-    if (!error) {
-      setProducts(products.map(p => p.id === id ? { ...p, price: parseFloat(editPrice) } : p));
-      setEditingId(null);
-    }
-  };
-
-  const deleteProduct = async (id) => {
-    if (confirm('¿Eliminar producto?')) {
-      const { error } = await supabase.from('products').delete().eq('id', id);
-      if (!error) setProducts(products.filter(p => p.id !== id));
-    }
-  };
-
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    if (!newTitle || !newPrice) return;
-    const { data, error } = await supabase.from('products').insert([
-      { title: newTitle, price: parseFloat(newPrice), category: newCategory, available: true }
-    ]).select();
-
-    if (!error && data) {
-      setProducts([...products, data[0]]);
-      setNewTitle('');
-      setNewPrice('');
-      setShowAddForm(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
-      {/* HEADER SUPERIOR */}
+      {/* HEADER */}
       <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-black tracking-tight text-gray-900">AL PASO</h1>
-        </div>
+        <h1 className="text-lg font-black tracking-tight text-gray-900">AL PASO</h1>
 
         <div className="flex items-center gap-2">
           {isAdmin ? (
@@ -180,7 +130,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* BANNER DE PORTADA PRINCIPAL */}
+      {/* PORTADA */}
       <div className="relative h-44 bg-slate-900 overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=800&auto=format&fit=crop"
@@ -195,7 +145,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* TARJETA DE INFORMACIÓN DEL LOCAL */}
+      {/* DETALLE LOCAL */}
       <div className="max-w-md mx-auto -mt-6 px-4 relative z-10">
         <div className="bg-white rounded-2xl p-4 shadow-md space-y-2 border border-gray-100">
           <div className="flex items-center gap-2 text-xs font-bold text-gray-800">
@@ -205,81 +155,41 @@ export default function App() {
 
           <div className="flex items-center justify-between text-xs pt-1 border-t border-gray-100">
             <div className="flex items-center gap-1.5 font-bold">
-              <span className={`w-2 h-2 rounded-full ${isOpenLocal ? 'bg-green-500' : 'bg-red-500'}`} />
-              <span>{isOpenLocal ? 'Abierto' : 'Cerrado'}</span>
+              <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-green-500' : 'bg-red-500'}`} />
+              <span className={isOpenLocal ? 'text-green-700' : 'text-red-600'}>
+                {isOpenLocal ? 'Abierto' : 'Cerrado'}
+              </span>
             </div>
             <span className="text-gray-500">Delivery disponible</span>
           </div>
         </div>
       </div>
 
-      {/* CONTROLES DE ADMINISTRADOR (SOLO VISIBLE SI ES ADMIN) */}
+      {/* CONTROL ADMIN */}
       {isAdmin && (
         <div className="max-w-md mx-auto px-4 mt-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 space-y-3">
-            <div className="flex justify-between items-center">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex justify-between items-center">
+            <div>
               <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
-                <Settings size={14} /> Panel de Administrador
+                <Settings size={14} /> Modo Administrador
               </span>
-              <button
-                onClick={() => setIsOpenLocal(!isOpenLocal)}
-                className={`px-3 py-1 rounded-full text-xs font-bold ${
-                  isOpenLocal ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-                }`}
-              >
-                {isOpenLocal ? 'LOCAL ABIERTO' : 'LOCAL CERRADO'}
-              </button>
+              <p className="text-[10px] text-amber-700">Agotar productos o cambiar horario</p>
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-amber-200/60">
-              <span className="text-xs font-bold text-amber-800">Gestionar Productos</span>
-              <button
-                onClick={() => setShowAddForm(!showAddForm)}
-                className="bg-black text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1"
-              >
-                <Plus size={12} /> Agregar Producto
-              </button>
-            </div>
-
-            {showAddForm && (
-              <form onSubmit={handleAddProduct} className="bg-white p-3 rounded-xl border border-amber-200 space-y-2">
-                <input
-                  type="text"
-                  placeholder="Nombre del producto"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  className="w-full p-2 border rounded-lg text-xs"
-                  required
-                />
-                <div className="flex gap-2">
-                  <input
-                    type="number"
-                    placeholder="Precio"
-                    value={newPrice}
-                    onChange={(e) => setNewPrice(e.target.value)}
-                    className="w-1/2 p-2 border rounded-lg text-xs"
-                    required
-                  />
-                  <select
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    className="w-1/2 p-2 border rounded-lg text-xs"
-                  >
-                    <option value="Empanadas">Empanadas</option>
-                    <option value="Sandwiches">Sandwiches</option>
-                    <option value="Bebidas">Bebidas</option>
-                  </select>
-                </div>
-                <button type="submit" className="w-full bg-black text-white py-1.5 rounded-lg text-xs font-bold">
-                  Guardar en Menú
-                </button>
-              </form>
-            )}
+            <button
+              onClick={() => setIsOpenLocal(!isOpenLocal)}
+              className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
+                isOpenLocal ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+              }`}
+            >
+              <Power size={12} />
+              {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
+            </button>
           </div>
         </div>
       )}
 
-      {/* BARRA DE BÚSQUEDA */}
+      {/* BÚSQUEDA */}
       <div className="max-w-md mx-auto px-4 mt-4">
         <div className="bg-white rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-sm border border-gray-100">
           <Search size={18} className="text-gray-400" />
@@ -293,7 +203,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* CARROUSEL DE CATEGORÍAS */}
+      {/* CATEGORÍAS */}
       <div className="max-w-md mx-auto px-4 mt-4">
         <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           {categories.map((cat) => (
@@ -312,48 +222,53 @@ export default function App() {
         </div>
       </div>
 
-      {/* LISTA DE PRODUCTOS */}
+      {/* LISTA DE PRODUCTOS (USA name, description e image) */}
       <div className="max-w-md mx-auto px-4 mt-4 space-y-3">
         {loading ? (
           <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
         ) : filteredProducts.length === 0 ? (
-          <p className="text-center text-xs text-gray-400 py-8">No se encontraron productos</p>
+          <p className="text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
         ) : (
           filteredProducts.map((item) => (
             <div
               key={item.id}
-              onClick={() => !isAdmin && openProductDetail(item)}
-              className={`bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex items-center justify-between gap-3 cursor-pointer transition-transform active:scale-[0.99] ${
-                !item.available ? 'opacity-50 bg-gray-50' : ''
+              onClick={() => openProductDetail(item)}
+              className={`bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex items-center justify-between gap-3 ${
+                item.available ? 'cursor-pointer active:scale-[0.99]' : 'opacity-60 bg-gray-50'
               }`}
             >
               <div className="flex-1 min-w-0">
-                <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.title}</h3>
-                <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.category}</p>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
+                  {!item.available && (
+                    <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded">
+                      AGOTADO
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
                 <p className="font-black text-sm text-gray-900 mt-2">${item.price}</p>
               </div>
 
-              <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+              <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
                 <img
-                  src="https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=200&auto=format&fit=crop"
-                  alt={item.title}
+                  src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=200&auto=format&fit=crop'}
+                  alt={item.name}
                   className="w-full h-full object-cover"
                 />
               </div>
 
-              {/* OPCIONES ADMIN EN LA TARJETA */}
               {isAdmin && (
-                <div className="flex flex-col gap-1 pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
+                <div className="pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
                   <button
                     onClick={() => toggleAvailable(item.id, item.available)}
-                    className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                      item.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
+                      item.available 
+                        ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                        : 'bg-green-100 text-green-700 hover:bg-green-200'
                     }`}
                   >
-                    {item.available ? 'Activo' : 'Agotado'}
-                  </button>
-                  <button onClick={() => deleteProduct(item.id)} className="text-red-500 p-1">
-                    <Trash2 size={14} />
+                    {item.available ? 'Agotar' : 'Activar'}
                   </button>
                 </div>
               )}
@@ -362,12 +277,12 @@ export default function App() {
         )}
       </div>
 
-      {/* BARRA INFERIOR DEL CARRITO (VER MI PEDIDO) */}
+      {/* CARRITO INFERIOR */}
       {cart.length > 0 && (
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-4 rounded-2xl font-black text-xs flex justify-between items-center shadow-lg active:scale-98 transition-all"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-4 rounded-2xl font-black text-xs flex justify-between items-center shadow-lg"
           >
             <div className="flex items-center gap-2">
               <span className="bg-white/20 w-6 h-6 rounded-full flex items-center justify-center text-[11px]">
@@ -380,10 +295,10 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DETALLE DE PRODUCTO */}
+      {/* MODAL DETALLE */}
       {selectedProduct && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
+          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
             <button
               onClick={() => setSelectedProduct(null)}
               className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full"
@@ -393,28 +308,22 @@ export default function App() {
 
             <div className="h-40 bg-gray-100 rounded-2xl overflow-hidden mb-4">
               <img
-                src="https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop"
-                alt={selectedProduct.title}
+                src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
+                alt={selectedProduct.name}
                 className="w-full h-full object-cover"
               />
             </div>
 
-            <h3 className="text-lg font-black">{selectedProduct.title}</h3>
-            <p className="text-xs text-gray-500 mt-1">{selectedProduct.category}</p>
+            <h3 className="text-lg font-black">{selectedProduct.name}</h3>
+            <p className="text-xs text-gray-500 mt-1">{selectedProduct.description || selectedProduct.category}</p>
 
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl">
-                <button
-                  onClick={() => setProductQuantity(Math.max(1, productQuantity - 1))}
-                  className="p-1 font-bold"
-                >
+                <button onClick={() => setProductQuantity(Math.max(1, productQuantity - 1))}>
                   <Minus size={14} />
                 </button>
                 <span className="font-extrabold text-sm">{productQuantity}</span>
-                <button
-                  onClick={() => setProductQuantity(productQuantity + 1)}
-                  className="p-1 font-bold"
-                >
+                <button onClick={() => setProductQuantity(productQuantity + 1)}>
                   <Plus size={14} />
                 </button>
               </div>
@@ -431,7 +340,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DEL CARRITO */}
+      {/* MODAL PEDIDO */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
@@ -449,7 +358,7 @@ export default function App() {
                 {cart.map((item) => (
                   <div key={item.cartId} className="py-3 flex justify-between items-center">
                     <div>
-                      <p className="font-extrabold text-xs">{item.title} (x{item.quantity})</p>
+                      <p className="font-extrabold text-xs">{item.name} (x{item.quantity})</p>
                       <p className="text-[10px] text-gray-400">${item.totalPrice}</p>
                     </div>
                     <button onClick={() => removeFromCart(item.cartId)} className="text-red-500 p-1">
@@ -475,7 +384,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE PIN PARA INGRESO ADMIN */}
+      {/* MODAL PIN */}
       {isPinModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl">
