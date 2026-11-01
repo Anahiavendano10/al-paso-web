@@ -24,10 +24,7 @@ export default function App() {
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
 
-  // 🔴 Número de WhatsApp (formato internacional sin signo +)
   const PHONE_NUMBER = "3884587924";
-
-  // 🔴 Enlace de Google Maps
   const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
 
   useEffect(() => {
@@ -178,7 +175,7 @@ export default function App() {
       {/* VISTA PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-4 space-y-4">
 
-        {/* PORTADA Y TARJETA TARJETA FLOTANTE */}
+        {/* PORTADA CON TARJETA SOBREPUESTA */}
         <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60 max-w-md mx-auto">
           <div className="h-56 relative overflow-hidden">
             <img
@@ -284,7 +281,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* LISTA DE PRODUCTOS (1 columna en celular, 2 columnas en PC) */}
+        {/* LISTA DE PRODUCTOS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
           {loading ? (
             <p className="col-span-full text-center text-xs text-gray-400 py-8">Cargando menú...</p>
@@ -359,7 +356,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE INFORMACIÓN DEL LOCAL */}
+      {/* MODAL DE INFORMACIÓN CON IMAGEN DEL MAPA INTEGRADA */}
       {isInfoModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
@@ -414,23 +411,40 @@ export default function App() {
                 </div>
               </div>
 
+              {/* SECCIÓN DE UBICACIÓN CON IMAGEN DEL MAPA DE GOOGLE MAPS */}
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
-                <div className="bg-gray-50 p-3 rounded-2xl space-y-2">
+                <div className="bg-gray-50 p-3.5 rounded-2xl space-y-3">
+                  
+                  {/* Vista previa estática / Mapa interactivo */}
+                  <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
+                    <iframe
+                      title="Mapa AL PASO"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.0168878205126!2d-58.381592!3d-34.603722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDM2JzEzLjQiUyA1OMKwMjInNTMuNyJX!5e0!3m2!1ses!2sar!4v1620000000000!5m2!1ses!2sar"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen=""
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+
                   <div className="flex items-center gap-2">
                     <MapPin size={16} className="text-[#95c623] shrink-0" />
                     <span className="text-xs font-bold text-gray-800">Galeria Doña Josefa local 47</span>
                   </div>
+
                   <a
                     href={MAPS_LINK}
                     target="_blank"
                     rel="noreferrer"
-                    className="block w-full text-center bg-black text-white py-2 rounded-xl font-bold text-xs hover:bg-gray-800 transition-all active:scale-95"
+                    className="block w-full text-center bg-black text-white py-2.5 rounded-xl font-bold text-xs hover:bg-gray-800 transition-all active:scale-95 shadow-sm"
                   >
                     Abrir ubicación en Google Maps 📍
                   </a>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
