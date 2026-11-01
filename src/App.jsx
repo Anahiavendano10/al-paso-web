@@ -30,7 +30,7 @@ export default function App() {
   const PHONE_NUMBER = "3885718946"; // Número de WhatsApp sin el +
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY"; // Tu dirección escrita
   const MAPS_LINK = "https://maps.app.goo.gl/tnZdMQFZKdjqpXuG7"; // Enlace al hacer clic en el botón
-  const IFRAME_SRC = "https://maps.app.goo.gl/tnZdMQFZKdjqpXuG7"; // Pega aquí el atributo src="..." de Google Maps
+  const IFRAME_SRC = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7451521.092550892!2d-75.03169287499996!3d-24.226453799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5!2s%22Al%20paso%22%20empanaderia%20y%20sandwicheria!5e0!3m2!1ses-419!2sar!4v1793574449324!5m2!1ses-419!2sar" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"; // Pega aquí el atributo src="..." de Google Maps
 
   useEffect(() => {
     fetchProducts();
