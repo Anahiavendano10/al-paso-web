@@ -25,7 +25,7 @@ export default function App() {
   const [productNotes, setProductNotes] = useState('');
 
   const PHONE_NUMBER = "3884587924";
-  const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
+  const MAPS_LINK = "https://maps.app.goo.gl/3rQNT4R1BLaGAYLWA";
 
   useEffect(() => {
     fetchProducts();
