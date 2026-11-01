@@ -27,10 +27,10 @@ export default function App() {
   // ==========================================
   // 🔴 DATOS DE TU LOCAL EN JUJUY
   // ==========================================
-  const PHONE_NUMBER = "3884587924";
+  const PHONE_NUMBER = "388718946";
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
   const MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Emilio+Bottini+1703+Sargento+Cabral+Jujuy";
-  const IFRAME_SRC = "https://maps.google.com/maps?q=Emilio%20Bottini%201703%2C%20Sargento%20Cabral%2C%20Jujuy&t=&z=15&ie=UTF8&iwloc=&output=embed";
+  const IFRAME_SRC = "https://www.google.com/maps/embed?pb=%211m14%211m8%211m3%211d454.804006856018%212d-65.27579691485312%213d-24.226678810345796%213m2%211i1024%212i768%214f13.1%213m3%211m2%211s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5%212s%22Al%20paso%22%20empanaderia%20y%20sandwicheria%215e0%213m2%211ses-419%212sus%214v1793575439458%215m2%211ses-419%212sus";
 
   useEffect(() => {
     fetchProducts();
