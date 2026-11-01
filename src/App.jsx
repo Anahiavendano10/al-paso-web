@@ -24,10 +24,7 @@ export default function App() {
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
 
-  // 🔴 Número de WhatsApp (formato internacional sin signo +)
   const PHONE_NUMBER = "3884587924";
-
-  // 🔴 Enlace de Google Maps
   const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
 
   useEffect(() => {
@@ -126,9 +123,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
-      {/* HEADER ADAPTATIVO */}
-      <header className="bg-white px-4 md:px-8 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
-        <div className="max-w-5xl w-full mx-auto flex justify-between items-center">
+      {/* HEADER SUPERIOR */}
+      <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
+        <div className="max-w-md w-full mx-auto flex justify-between items-center">
           <button
             onClick={() => setIsInfoModalOpen(true)}
             className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
@@ -175,12 +172,12 @@ export default function App() {
         </div>
       </header>
 
-      {/* CONTENEDOR PRINCIPAL (Mobile & Desktop) */}
-      <main className="max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 mt-4 space-y-4">
+      {/* VISTA PRINCIPAL CONTENIDA */}
+      <div className="max-w-md mx-auto px-4 mt-4 space-y-4">
 
-        {/* TARJETA DE PORTADA */}
-        <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60">
-          <div className="h-52 md:h-64 relative overflow-hidden">
+        {/* PORTADA CON TARJETA SOBREPUESTA */}
+        <div className="relative rounded-3xl overflow-hidden bg-slate-900 shadow-md border border-gray-200">
+          <div className="h-56 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
               alt="Portada AL PASO"
@@ -188,11 +185,11 @@ export default function App() {
             />
           </div>
 
-          <div className="p-3 bg-transparent -mt-24 md:-mt-28 relative z-10">
-            <div className="bg-white rounded-[1.8rem] p-5 shadow-xl border border-gray-100 space-y-3">
+          <div className="p-3 bg-transparent -mt-28 relative z-10">
+            <div className="bg-white rounded-2xl p-5 shadow-xl border border-gray-100 space-y-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-black text-black tracking-tight">AL PASO</h2>
+                  <h2 className="text-2xl font-black text-black tracking-tight">AL PASO</h2>
                   <p className="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase mt-0.5">
                     EMPANADERÍA Y SÁNDWICHERÍA
                   </p>
@@ -232,9 +229,9 @@ export default function App() {
           </div>
         </div>
 
-        {/* MODO ADMIN */}
+        {/* MODO ADMINISTRADOR */}
         {isAdmin && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex justify-between items-center shadow-sm">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center shadow-sm">
             <div>
               <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
                 <Settings size={14} /> Modo Administrador
@@ -284,18 +281,18 @@ export default function App() {
           </div>
         </div>
 
-        {/* GRILLA DE PRODUCTOS (1 columna en celular, 2 columnas en PC) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+        {/* LISTA DE PRODUCTOS */}
+        <div className="space-y-3 pt-2">
           {loading ? (
-            <p className="col-span-full text-center text-xs text-gray-400 py-8">Cargando menú...</p>
+            <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
           ) : filteredProducts.length === 0 ? (
-            <p className="col-span-full text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
+            <p className="text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
           ) : (
             filteredProducts.map((item) => (
               <div
                 key={item.id}
                 onClick={() => openProductDetail(item)}
-                className={`bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 flex items-center justify-between gap-3 ${
+                className={`bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex items-center justify-between gap-3 ${
                   item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60 bg-gray-50'
                 }`}
               >
@@ -303,7 +300,7 @@ export default function App() {
                   <div className="flex items-center gap-2">
                     <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
                     {!item.available && (
-                      <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded shrink-0">
+                      <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded">
                         AGOTADO
                       </span>
                     )}
@@ -339,11 +336,11 @@ export default function App() {
           )}
         </div>
 
-      </main>
+      </div>
 
-      {/* BOTÓN FLOTANTE DEL CARRITO */}
+      {/* CARRITO FLOTANTE */}
       {cart.length > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 max-w-md md:max-w-lg mx-auto z-30">
+        <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
             onClick={() => setIsCartOpen(true)}
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 px-5 rounded-2xl font-black text-xs flex justify-between items-center shadow-xl active:scale-98 transition-all"
@@ -359,7 +356,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE INFORMACIÓN */}
+      {/* MODAL DE INFORMACIÓN DEL LOCAL */}
       {isInfoModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
@@ -539,7 +536,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DEL CARRITO / WHATSAPP */}
+      {/* MODAL CARRITO / WHATSAPP */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
