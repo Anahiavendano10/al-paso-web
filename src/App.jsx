@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Bike, ShoppingPack 
+  MapPin, Settings, Power, Menu, Instagram, Facebook, Info 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -24,10 +24,10 @@ export default function App() {
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
 
-  // 🔴 REEMPLAZA CON TU NÚMERO DE WHATSAPP REAL (sin signo + ni espacios)
-  const PHONE_NUMBER = "5491112345678";
+  // 🔴 Número de WhatsApp (formato internacional sin signo +)
+  const PHONE_NUMBER = "3884587924";
 
-  // 🔴 REEMPLAZA CON TU ENLACE DE GOOGLE MAPS REAL
+  // 🔴 Enlace de Google Maps
   const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
 
   useEffect(() => {
@@ -126,18 +126,18 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
-      {/* HEADER IDÉNTICO A LA CAPTURA */}
-      <header className="bg-white px-5 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
+      {/* HEADER SUPERIOR EXACTO */}
+      <header className="bg-white px-5 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
         <button
           onClick={() => setIsInfoModalOpen(true)}
-          className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-full transition-all"
+          className="p-1 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
         >
           <Menu size={22} />
         </button>
 
         <div className="flex items-center gap-1.5">
           <h1 className="text-xl font-black tracking-wider text-black">AL PASO</h1>
-          <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#83c613]' : 'bg-red-500'}`} />
+          <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export default function App() {
               className="bg-black text-white p-1.5 rounded-full"
               title="Salir de Modo Admin"
             >
-              <LogOut size={18} />
+              <LogOut size={16} />
             </button>
           ) : (
             <button
@@ -173,70 +173,73 @@ export default function App() {
         </div>
       </header>
 
-      {/* CONTENEDOR PRINCIPAL DE PORTADA Y TARJETA FLOTANTE */}
-      <div className="max-w-md mx-auto px-3 mt-3">
-        <div className="relative rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-[#16202c]">
-          {/* Imagen de fondo de la portada */}
-          <div className="h-56 relative overflow-hidden">
+      {/* SECCIÓN PORTADA Y TARJETA FLOTANTE (REPLICADA DE LA IMAGEN) */}
+      <div className="max-w-md mx-auto px-4 mt-4">
+        <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60">
+          
+          {/* Imagen de Fondo de Portada */}
+          <div className="h-60 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
               alt="Portada AL PASO"
-              className="w-full h-full object-cover opacity-80"
+              className="w-full h-full object-cover opacity-90"
             />
-            <div className="absolute inset-0 bg-black/20" />
           </div>
 
-          {/* TARJETA BLANCA SOBREPUESTA IDÉNTICA A LA IMAGEN */}
-          <div className="p-3 bg-transparent -mt-24 relative z-10">
-            <div className="bg-white rounded-3xl p-5 shadow-lg border border-gray-100/80 space-y-3">
+          {/* Tarjeta Flotante Blanca Interior */}
+          <div className="p-3 bg-transparent -mt-28 relative z-10">
+            <div className="bg-white rounded-[1.8rem] p-5 shadow-xl border border-gray-100 space-y-3">
+              
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-2xl font-black text-black tracking-tight">AL PASO</h2>
-                  <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-0.5">
+                  <p className="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase mt-0.5">
                     EMPANADERÍA Y SÁNDWICHERÍA
                   </p>
                 </div>
 
                 <button
                   onClick={() => setIsInfoModalOpen(true)}
-                  className="text-[#83c613] p-1 hover:bg-lime-50 rounded-full transition-all"
+                  className="text-[#95c623] p-1 hover:bg-lime-50 rounded-full transition-all"
                 >
                   <Info size={24} />
                 </button>
               </div>
 
-              {/* Dirección con ícono verde */}
-              <div className="flex items-center gap-1.5 text-xs text-slate-600 font-semibold pt-0.5">
-                <MapPin size={16} className="text-[#83c613] shrink-0" />
-                <span>Av. Corrientes 1234, Buenos Aires</span>
+              {/* Dirección */}
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold pt-0.5">
+                <MapPin size={16} className="text-[#95c623] shrink-0" />
+                <span>Galeria Doña Josefa local 47</span>
               </div>
 
-              {/* Estado y etiquetas Delivery / Retiro */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              {/* Fila Inferior: Estado y Métodos (Delivery / Retiro) */}
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <div className="flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#83c613]' : 'bg-red-500'}`} />
-                  <span className="font-bold text-xs text-black">
+                  <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
+                  <span className="font-extrabold text-xs text-black">
                     {isOpenLocal ? 'Abierto' : 'Cerrado'}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                  <span className="bg-[#f2f4f8] text-slate-700 px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
                     🛵 Delivery
                   </span>
-                  <span className="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                  <span className="bg-[#f2f4f8] text-slate-700 px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
                     🛍️ Retiro
                   </span>
                 </div>
               </div>
+
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* PANEL DE MODO ADMIN */}
+      {/* MODO ADMINISTRADOR */}
       {isAdmin && (
-        <div className="max-w-md mx-auto px-3 mt-3">
+        <div className="max-w-md mx-auto px-4 mt-3">
           <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center">
             <div>
               <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
@@ -258,8 +261,8 @@ export default function App() {
         </div>
       )}
 
-      {/* BÚSQUEDA */}
-      <div className="max-w-md mx-auto px-3 mt-4">
+      {/* BARRA DE BÚSQUEDA */}
+      <div className="max-w-md mx-auto px-4 mt-4">
         <div className="bg-white rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-sm border border-gray-100">
           <Search size={18} className="text-gray-400" />
           <input
@@ -272,8 +275,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* CATEGORÍAS */}
-      <div className="max-w-md mx-auto px-3 mt-3">
+      {/* CARROUSEL DE CATEGORÍAS */}
+      <div className="max-w-md mx-auto px-4 mt-3">
         <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
           {categories.map((cat) => (
             <button
@@ -292,7 +295,7 @@ export default function App() {
       </div>
 
       {/* LISTA DE PRODUCTOS */}
-      <div className="max-w-md mx-auto px-3 mt-4 space-y-3">
+      <div className="max-w-md mx-auto px-4 mt-4 space-y-3">
         {loading ? (
           <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
         ) : filteredProducts.length === 0 ? (
@@ -346,7 +349,7 @@ export default function App() {
         )}
       </div>
 
-      {/* BARRA INFERIOR DE MI PEDIDO */}
+      {/* BARRA INFERIOR DEL CARRITO */}
       {cart.length > 0 && (
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
@@ -423,8 +426,8 @@ export default function App() {
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
                 <div className="bg-gray-50 p-3 rounded-2xl space-y-2">
                   <div className="flex items-center gap-2">
-                    <MapPin size={16} className="text-[#83c613] shrink-0" />
-                    <span className="text-xs font-bold text-gray-800">Av. Corrientes 1234, Buenos Aires</span>
+                    <MapPin size={16} className="text-[#95c623] shrink-0" />
+                    <span className="text-xs font-bold text-gray-800">Galeria Doña Josefa local 47</span>
                   </div>
                   <a
                     href={MAPS_LINK}
