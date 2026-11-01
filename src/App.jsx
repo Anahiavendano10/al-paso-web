@@ -31,7 +31,9 @@ export default function App() {
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
   const MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Emilio+Bottini+1703+Sargento+Cabral+Jujuy";
   const IFRAME_SRC = "https://www.google.com/maps/embed?pb=%211m14%211m8%211m3%211d454.804006856018%212d-65.27579691485312%213d-24.226678810345796%213m2%211i1024%212i768%214f13.1%213m3%211m2%211s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5%212s%22Al%20paso%22%20empanaderia%20y%20sandwicheria%215e0%213m2%211ses-419%212sus%214v1793575439458%215m2%211ses-419%212sus";
-
+  // 🔴 ENLACES DE REDES SOCIALES (reemplaza con tus perfiles reales)
+  const INSTAGRAM_LINK = "https://www.instagram.com/tu_perfil_alpaso";
+  const FACEBOOK_LINK = "https://www.facebook.com/tu_pagina_alpaso";
   useEffect(() => {
     fetchProducts();
     if (localStorage.getItem('alpaso_admin_active') === 'true') {
@@ -647,6 +649,30 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* REDES SOCIALES */}
+      <div>
+        <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
+        <div className="flex gap-3">
+          <a
+          href={INSTAGRAM_LINK}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-1.5 bg-gray-100 px-3.5 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200 transition-all active:scale-95"
+          >
+            <Instagram size={14} /> Instagram
+          </a>
+          
+          <a
+          href={FACEBOOK_LINK}
+          target="_blank"
+          rel="noreferrer"
+          className="flex items-center gap-1.5 bg-gray-100 px-3.5 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200 transition-all active:scale-95"
+          >
+            <Facebook size={14} /> Facebook
+            </a>
+            </div>
+            </div>
 
     </div>
   );
