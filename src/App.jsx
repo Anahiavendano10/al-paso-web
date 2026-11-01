@@ -24,8 +24,13 @@ export default function App() {
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
 
-  const PHONE_NUMBER = "3884587924";
-  const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
+  // ==========================================
+  // 🔴 CONFIGURACIÓN DE TUS DATOS REALES
+  // ==========================================
+  const PHONE_NUMBER = "3885718946"; // Número de WhatsApp sin el +
+  const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY"; // Tu dirección escrita
+  const MAPS_LINK = "https://maps.app.goo.gl/tnZdMQFZKdjqpXuG7"; // Enlace al hacer clic en el botón
+  const IFRAME_SRC = "https://maps.app.goo.gl/tnZdMQFZKdjqpXuG7"; // Pega aquí el atributo src="..." de Google Maps
 
   useEffect(() => {
     fetchProducts();
@@ -172,10 +177,10 @@ export default function App() {
         </div>
       </header>
 
-      {/* VISTA PRINCIPAL */}
+      {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-4 space-y-4">
 
-        {/* PORTADA CON TARJETA SOBREPUESTA */}
+        {/* PORTADA Y TARJETA FLOTANTE */}
         <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60 max-w-md mx-auto">
           <div className="h-56 relative overflow-hidden">
             <img
@@ -205,7 +210,7 @@ export default function App() {
 
               <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold pt-0.5">
                 <MapPin size={16} className="text-[#95c623] shrink-0" />
-                <span>Galeria Doña Josefa local 47</span>
+                <span>{DIRECCION_REAL}</span>
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
@@ -251,7 +256,7 @@ export default function App() {
           </div>
         )}
 
-        {/* BUSCADOR Y CATEGORÍAS */}
+        {/* BÚSQUEDA Y CATEGORÍAS */}
         <div className="space-y-3">
           <div className="bg-white rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-sm border border-gray-100">
             <Search size={18} className="text-gray-400" />
@@ -356,7 +361,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE INFORMACIÓN CON IMAGEN DEL MAPA INTEGRADA */}
+      {/* MODAL DE INFORMACIÓN DEL LOCAL CON UBICACIÓN */}
       {isInfoModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
@@ -411,16 +416,16 @@ export default function App() {
                 </div>
               </div>
 
-              {/* SECCIÓN DE UBICACIÓN CON IMAGEN DEL MAPA DE GOOGLE MAPS */}
+              {/* SECCIÓN DE UBICACIÓN */}
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
                 <div className="bg-gray-50 p-3.5 rounded-2xl space-y-3">
                   
-                  {/* Vista previa estática / Mapa interactivo */}
+                  {/* Mapa Interactivo Google Maps */}
                   <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
                     <iframe
                       title="Mapa AL PASO"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.0168878205126!2d-58.381592!3d-34.603722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDM2JzEzLjQiUyA1OMKwMjInNTMuNyJX!5e0!3m2!1ses!2sar!4v1620000000000!5m2!1ses!2sar"
+                      src={IFRAME_SRC}
                       width="100%"
                       height="100%"
                       style={{ border: 0 }}
@@ -429,11 +434,13 @@ export default function App() {
                     ></iframe>
                   </div>
 
+                  {/* Dirección */}
                   <div className="flex items-center gap-2">
                     <MapPin size={16} className="text-[#95c623] shrink-0" />
-                    <span className="text-xs font-bold text-gray-800">Galeria Doña Josefa local 47</span>
+                    <span className="text-xs font-bold text-gray-800">{DIRECCION_REAL}</span>
                   </div>
 
+                  {/* Botón de Google Maps */}
                   <a
                     href={MAPS_LINK}
                     target="_blank"
