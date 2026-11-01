@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Star 
+  MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Star, RefreshCw 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -25,7 +25,7 @@ export default function App() {
   const [productNotes, setProductNotes] = useState('');
 
   // ==========================================
-  // 🔴 CONFIGURACIÓN DE TUS DATOS REALES
+  // 🔴 DATOS DEL LOCAL
   // ==========================================
   const PHONE_NUMBER = "3884587924";
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
@@ -47,6 +47,26 @@ export default function App() {
     const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true });
     if (!error && data) setProducts(data);
     setLoading(false);
+  };
+
+  const seedEmpanadasInSupabase = async () => {
+    setLoading(true);
+    await supabase.from('products').delete().eq('category', 'Empanadas');
+
+    const empanadasList = [
+      { name: 'Empanada de Pollo', description: 'Pollo deshesado condimentado con vegetales', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Carne', description: 'Carne jugosa cortada a cuchillo con especias', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Queso', description: 'Queso derretido artesanal', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Caprese', description: 'Queso, tomate fresco y albahaca', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Pollo y Jamón', description: 'Pollo tierno con trozos de jamón cocido', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Osobuco', description: 'Osobuco braseado lentamente', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Árabe', description: 'Carne marinada con limón y especias orientales', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Pollo al Champiñón', description: 'Pollo en salsa de champiñones a la crema', price: 1333.33, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Matambre', description: 'Matambre tierno tiernizado y condimentado', price: 1333.33, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' }
+    ];
+
+    await supabase.from('products').insert(empanadasList);
+    fetchProducts();
   };
 
   const handlePinSubmit = (e) => {
@@ -74,10 +94,11 @@ export default function App() {
     return matchesSearch && matchesCat;
   });
 
+  // Detección mejorada para Pollo al Champiñón y Matambre (con o sin tilde)
   const isSpecialEmpanada = (item) => {
-    if (item.category !== 'Empanadas') return false;
+    if (!item || item.category !== 'Empanadas') return false;
     const nameLower = item.name.toLowerCase();
-    return nameLower.includes('champiñon') || nameLower.includes('matambre');
+    return nameLower.includes('champi') || nameLower.includes('matambre');
   };
 
   const openProductDetail = (prod) => {
@@ -265,22 +286,31 @@ export default function App() {
 
         {/* MODO ADMINISTRADOR */}
         {isAdmin && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center shadow-sm max-w-md mx-auto">
-            <div>
-              <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
-                <Settings size={14} /> Modo Administrador
-              </span>
-              <p className="text-[10px] text-amber-700">Cambia horario o marca productos agotados</p>
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 space-y-2 shadow-sm max-w-md mx-auto">
+            <div className="flex justify-between items-center">
+              <div>
+                <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
+                  <Settings size={14} /> Modo Administrador
+                </span>
+                <p className="text-[10px] text-amber-700">Cambia horario o marca productos agotados</p>
+              </div>
+
+              <button
+                onClick={() => setIsOpenLocal(!isOpenLocal)}
+                className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all ${
+                  isOpenLocal ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                }`}
+              >
+                <Power size={12} />
+                {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
+              </button>
             </div>
 
             <button
-              onClick={() => setIsOpenLocal(!isOpenLocal)}
-              className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all ${
-                isOpenLocal ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-              }`}
+              onClick={seedEmpanadasInSupabase}
+              className="w-full bg-amber-600 hover:bg-amber-700 text-white py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition-all"
             >
-              <Power size={12} />
-              {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
+              <RefreshCw size={12} /> Cargar / Restablecer Sabores de Empanadas
             </button>
           </div>
         )}
@@ -320,7 +350,15 @@ export default function App() {
           {loading ? (
             <p className="col-span-full text-center text-xs text-gray-400 py-8">Cargando menú...</p>
           ) : filteredProducts.length === 0 ? (
-            <p className="col-span-full text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
+            <div className="col-span-full text-center py-8 space-y-3">
+              <p className="text-xs text-gray-400">No hay productos disponibles en esta sección</p>
+              <button
+                onClick={seedEmpanadasInSupabase}
+                className="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"
+              >
+                <RefreshCw size={12} /> Cargar todas las empanadas ahora
+              </button>
+            </div>
           ) : (
             filteredProducts.map((item) => {
               const especial = isSpecialEmpanada(item);
@@ -338,7 +376,7 @@ export default function App() {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
 
-                      {/* BADGE ESPECIAL DE 16 MIL */}
+                      {/* BADGE ESPECIAL ⭐ */}
                       {especial && (
                         <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
                           <Star size={9} className="fill-amber-950" /> ESPECIAL
@@ -354,18 +392,20 @@ export default function App() {
 
                     <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
                     
+                    {/* PRECIO DESTACADO EN GRANDE: DOCENA */}
                     <div className="flex items-center gap-2 mt-2">
-                      <span className="font-black text-sm text-gray-900">
-                        ${Math.round(item.price)} {item.category === 'Empanadas' ? 'u.' : ''}
-                      </span>
-                      {especial && (
-                        <span className="text-[10px] font-extrabold text-amber-700 bg-amber-100/80 px-1.5 py-0.5 rounded-md">
-                          $16.000 doc.
-                        </span>
-                      )}
-                      {item.category === 'Empanadas' && !especial && (
-                        <span className="text-[10px] font-bold text-gray-400">
-                          $14.000 doc.
+                      {item.category === 'Empanadas' ? (
+                        <>
+                          <span className="font-black text-sm text-gray-900">
+                            ${especial ? '16.000' : '14.000'} doc.
+                          </span>
+                          <span className="text-[10px] font-bold text-gray-400">
+                            (${Math.round(item.price)} u.)
+                          </span>
+                        </>
+                      ) : (
+                        <span className="font-black text-sm text-gray-900">
+                          ${Math.round(item.price)}
                         </span>
                       )}
                     </div>
