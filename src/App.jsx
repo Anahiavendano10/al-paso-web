@@ -25,12 +25,13 @@ export default function App() {
   const [productNotes, setProductNotes] = useState('');
 
   // ==========================================
-  // 🔴 CONFIGURACIÓN DE TUS DATOS REALES
+  // 🔴 DATOS DE TU LOCAL EN JUJUY
   // ==========================================
-  const PHONE_NUMBER = "3885718946"; // Número de WhatsApp sin el +
-  const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY"; // Tu dirección escrita
-  const MAPS_LINK = "https://maps.app.goo.gl/tnZdMQFZKdjqpXuG7"; // Enlace al hacer clic en el botón
-  const IFRAME_SRC = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7451521.092550892!2d-75.03169287499996!3d-24.226453799999998!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5!2s%22Al%20paso%22%20empanaderia%20y%20sandwicheria!5e0!3m2!1ses-419!2sar!4v1793574449324!5m2!1ses-419!2sar" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"; // Pega aquí el atributo src="..." de Google Maps
+  const PHONE_NUMBER = "3884587924";
+  const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
+  const MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Emilio+Bottini+1703+Sargento+Cabral+Jujuy";
+  // Enlace del mapa OpenStreetMap centrado en las coordenadas de la zona en Jujuy
+  const IFRAME_SRC = "https://www.openstreetmap.org/export/embed.html?bbox=-65.3150000%2C-24.1950000%2C-65.2850000%2C-24.1750000&layer=mapnik&marker=-24.1856800%2C-65.3006200";
 
   useEffect(() => {
     fetchProducts();
@@ -361,7 +362,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE INFORMACIÓN DEL LOCAL CON UBICACIÓN */}
+      {/* MODAL DE INFORMACIÓN DEL LOCAL */}
       {isInfoModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
@@ -421,7 +422,7 @@ export default function App() {
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
                 <div className="bg-gray-50 p-3.5 rounded-2xl space-y-3">
                   
-                  {/* Mapa Interactivo Google Maps */}
+                  {/* MAPA VISIBLE GARANTIZADO */}
                   <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
                     <iframe
                       title="Mapa AL PASO"
@@ -434,13 +435,13 @@ export default function App() {
                     ></iframe>
                   </div>
 
-                  {/* Dirección */}
+                  {/* DIRECCIÓN */}
                   <div className="flex items-center gap-2">
                     <MapPin size={16} className="text-[#95c623] shrink-0" />
                     <span className="text-xs font-bold text-gray-800">{DIRECCION_REAL}</span>
                   </div>
 
-                  {/* Botón de Google Maps */}
+                  {/* BOTÓN GOOGLE MAPS */}
                   <a
                     href={MAPS_LINK}
                     target="_blank"
