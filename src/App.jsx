@@ -126,59 +126,61 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
-      {/* HEADER SUPERIOR EXACTO */}
-      <header className="bg-white px-5 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
-        <button
-          onClick={() => setIsInfoModalOpen(true)}
-          className="p-1 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
-        >
-          <Menu size={22} />
-        </button>
-
-        <div className="flex items-center gap-1.5">
-          <h1 className="text-xl font-black tracking-wider text-black">AL PASO</h1>
-          <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
-        </div>
-
-        <div className="flex items-center gap-2">
-          {isAdmin ? (
-            <button
-              onClick={handleLogout}
-              className="bg-black text-white p-1.5 rounded-full"
-              title="Salir de Modo Admin"
-            >
-              <LogOut size={16} />
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsPinModalOpen(true)}
-              className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full"
-              title="Acceso Administración"
-            >
-              <Settings size={20} />
-            </button>
-          )}
-
+      {/* HEADER ADAPTATIVO */}
+      <header className="bg-white px-4 md:px-8 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
+        <div className="max-w-5xl w-full mx-auto flex justify-between items-center">
           <button
-            onClick={() => setIsCartOpen(true)}
-            className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-full relative"
+            onClick={() => setIsInfoModalOpen(true)}
+            className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
           >
-            <ShoppingBag size={22} />
-            {cart.length > 0 && (
-              <span className="absolute top-0 right-0 bg-black text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
-                {cart.length}
-              </span>
-            )}
+            <Menu size={22} />
           </button>
+
+          <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setIsInfoModalOpen(true)}>
+            <h1 className="text-xl font-black tracking-wider text-black">AL PASO</h1>
+            <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            {isAdmin ? (
+              <button
+                onClick={handleLogout}
+                className="bg-black text-white p-1.5 rounded-full"
+                title="Salir de Modo Admin"
+              >
+                <LogOut size={16} />
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsPinModalOpen(true)}
+                className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full"
+                title="Acceso Administración"
+              >
+                <Settings size={20} />
+              </button>
+            )}
+
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-full relative"
+            >
+              <ShoppingBag size={22} />
+              {cart.length > 0 && (
+                <span className="absolute top-0 right-0 bg-black text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">
+                  {cart.length}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* SECCIÓN PORTADA Y TARJETA FLOTANTE (REPLICADA DE LA IMAGEN) */}
-      <div className="max-w-md mx-auto px-4 mt-4">
+      {/* CONTENEDOR PRINCIPAL (Mobile & Desktop) */}
+      <main className="max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 mt-4 space-y-4">
+
+        {/* TARJETA DE PORTADA */}
         <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60">
-          
-          {/* Imagen de Fondo de Portada */}
-          <div className="h-60 relative overflow-hidden">
+          <div className="h-52 md:h-64 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
               alt="Portada AL PASO"
@@ -186,13 +188,11 @@ export default function App() {
             />
           </div>
 
-          {/* Tarjeta Flotante Blanca Interior */}
-          <div className="p-3 bg-transparent -mt-28 relative z-10">
+          <div className="p-3 bg-transparent -mt-24 md:-mt-28 relative z-10">
             <div className="bg-white rounded-[1.8rem] p-5 shadow-xl border border-gray-100 space-y-3">
-              
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-black text-black tracking-tight">AL PASO</h2>
+                  <h2 className="text-2xl md:text-3xl font-black text-black tracking-tight">AL PASO</h2>
                   <p className="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase mt-0.5">
                     EMPANADERÍA Y SÁNDWICHERÍA
                   </p>
@@ -206,13 +206,11 @@ export default function App() {
                 </button>
               </div>
 
-              {/* Dirección */}
               <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold pt-0.5">
                 <MapPin size={16} className="text-[#95c623] shrink-0" />
                 <span>Galeria Doña Josefa local 47</span>
               </div>
 
-              {/* Fila Inferior: Estado y Métodos (Delivery / Retiro) */}
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <div className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
@@ -230,17 +228,13 @@ export default function App() {
                   </span>
                 </div>
               </div>
-
             </div>
           </div>
-
         </div>
-      </div>
 
-      {/* MODO ADMINISTRADOR */}
-      {isAdmin && (
-        <div className="max-w-md mx-auto px-4 mt-3">
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center">
+        {/* MODO ADMIN */}
+        {isAdmin && (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex justify-between items-center shadow-sm">
             <div>
               <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
                 <Settings size={14} /> Modo Administrador
@@ -250,7 +244,7 @@ export default function App() {
 
             <button
               onClick={() => setIsOpenLocal(!isOpenLocal)}
-              className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
+              className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all ${
                 isOpenLocal ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
               }`}
             >
@@ -258,103 +252,101 @@ export default function App() {
               {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
             </button>
           </div>
-        </div>
-      )}
-
-      {/* BARRA DE BÚSQUEDA */}
-      <div className="max-w-md mx-auto px-4 mt-4">
-        <div className="bg-white rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-sm border border-gray-100">
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Buscar tu plato favorito..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-transparent text-xs font-semibold outline-none"
-          />
-        </div>
-      </div>
-
-      {/* CARROUSEL DE CATEGORÍAS */}
-      <div className="max-w-md mx-auto px-4 mt-3">
-        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
-                selectedCategory === cat
-                  ? 'bg-black text-white shadow-sm'
-                  : 'bg-white text-gray-700 border border-gray-100'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* LISTA DE PRODUCTOS */}
-      <div className="max-w-md mx-auto px-4 mt-4 space-y-3">
-        {loading ? (
-          <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
-        ) : filteredProducts.length === 0 ? (
-          <p className="text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
-        ) : (
-          filteredProducts.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => openProductDetail(item)}
-              className={`bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex items-center justify-between gap-3 ${
-                item.available ? 'cursor-pointer active:scale-[0.99]' : 'opacity-60 bg-gray-50'
-              }`}
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
-                  {!item.available && (
-                    <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded">
-                      AGOTADO
-                    </span>
-                  )}
-                </div>
-                <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
-                <p className="font-black text-sm text-gray-900 mt-2">${item.price}</p>
-              </div>
-
-              <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
-                <img
-                  src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=200&auto=format&fit=crop'}
-                  alt={item.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {isAdmin && (
-                <div className="pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => toggleAvailable(item.id, item.available)}
-                    className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
-                      item.available 
-                        ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                        : 'bg-green-100 text-green-700 hover:bg-green-200'
-                    }`}
-                  >
-                    {item.available ? 'Agotar' : 'Activar'}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))
         )}
-      </div>
 
-      {/* BARRA INFERIOR DEL CARRITO */}
+        {/* BUSCADOR Y CATEGORÍAS */}
+        <div className="space-y-3">
+          <div className="bg-white rounded-2xl px-4 py-2.5 flex items-center gap-2 shadow-sm border border-gray-100">
+            <Search size={18} className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar tu plato favorito..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-transparent text-xs font-semibold outline-none"
+            />
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-black text-white shadow-sm'
+                    : 'bg-white text-gray-700 border border-gray-100'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* GRILLA DE PRODUCTOS (1 columna en celular, 2 columnas en PC) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+          {loading ? (
+            <p className="col-span-full text-center text-xs text-gray-400 py-8">Cargando menú...</p>
+          ) : filteredProducts.length === 0 ? (
+            <p className="col-span-full text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
+          ) : (
+            filteredProducts.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => openProductDetail(item)}
+                className={`bg-white rounded-2xl p-3.5 shadow-sm border border-gray-100 flex items-center justify-between gap-3 ${
+                  item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60 bg-gray-50'
+                }`}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
+                    {!item.available && (
+                      <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded shrink-0">
+                        AGOTADO
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
+                  <p className="font-black text-sm text-gray-900 mt-2">${item.price}</p>
+                </div>
+
+                <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
+                  <img
+                    src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=200&auto=format&fit=crop'}
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {isAdmin && (
+                  <div className="pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={() => toggleAvailable(item.id, item.available)}
+                      className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
+                        item.available 
+                          ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                          : 'bg-green-100 text-green-700 hover:bg-green-200'
+                      }`}
+                    >
+                      {item.available ? 'Agotar' : 'Activar'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+
+      </main>
+
+      {/* BOTÓN FLOTANTE DEL CARRITO */}
       {cart.length > 0 && (
-        <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
+        <div className="fixed bottom-4 left-4 right-4 max-w-md md:max-w-lg mx-auto z-30">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 px-4 rounded-2xl font-black text-xs flex justify-between items-center shadow-lg"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 px-5 rounded-2xl font-black text-xs flex justify-between items-center shadow-xl active:scale-98 transition-all"
           >
             <div className="flex items-center gap-2">
               <span className="bg-white/20 w-6 h-6 rounded-full flex items-center justify-center text-[11px]">
@@ -367,7 +359,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE INFORMACIÓN DEL LOCAL */}
+      {/* MODAL DE INFORMACIÓN */}
       {isInfoModalOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
@@ -455,7 +447,7 @@ export default function App() {
               <X size={18} />
             </button>
 
-            <div className="h-40 bg-gray-100 rounded-2xl overflow-hidden mb-4">
+            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4">
               <img
                 src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
                 alt={selectedProduct.name}
@@ -547,7 +539,7 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL CARRITO / WHATSAPP */}
+      {/* MODAL DEL CARRITO / WHATSAPP */}
       {isCartOpen && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
