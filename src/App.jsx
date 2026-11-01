@@ -24,8 +24,11 @@ export default function App() {
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
 
+  // 🔴 Número de WhatsApp (formato internacional sin signo +)
   const PHONE_NUMBER = "3884587924";
-  const MAPS_LINK = "https://maps.app.goo.gl/3rQNT4R1BLaGAYLWA";
+
+  // 🔴 Enlace de Google Maps
+  const MAPS_LINK = "https://maps.google.com/?q=AL+PASO+Empanaderia";
 
   useEffect(() => {
     fetchProducts();
@@ -124,11 +127,11 @@ export default function App() {
     <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
 
       {/* HEADER SUPERIOR */}
-      <header className="bg-white px-4 py-3 flex justify-between items-center shadow-sm sticky top-0 z-30 border-b border-gray-100">
-        <div className="max-w-md w-full mx-auto flex justify-between items-center">
+      <header className="bg-white px-5 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
+        <div className="max-w-md md:max-w-3xl w-full mx-auto flex justify-between items-center">
           <button
             onClick={() => setIsInfoModalOpen(true)}
-            className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
+            className="p-1 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
           >
             <Menu size={22} />
           </button>
@@ -172,11 +175,11 @@ export default function App() {
         </div>
       </header>
 
-      {/* VISTA PRINCIPAL CONTENIDA */}
-      <div className="max-w-md mx-auto px-4 mt-4 space-y-4">
+      {/* VISTA PRINCIPAL */}
+      <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-4 space-y-4">
 
-        {/* PORTADA CON TARJETA SOBREPUESTA */}
-        <div className="relative rounded-3xl overflow-hidden bg-slate-900 shadow-md border border-gray-200">
+        {/* PORTADA Y TARJETA TARJETA FLOTANTE */}
+        <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60 max-w-md mx-auto">
           <div className="h-56 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
@@ -186,7 +189,7 @@ export default function App() {
           </div>
 
           <div className="p-3 bg-transparent -mt-28 relative z-10">
-            <div className="bg-white rounded-2xl p-5 shadow-xl border border-gray-100 space-y-3">
+            <div className="bg-white rounded-[1.8rem] p-5 shadow-xl border border-gray-100 space-y-3">
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-2xl font-black text-black tracking-tight">AL PASO</h2>
@@ -231,7 +234,7 @@ export default function App() {
 
         {/* MODO ADMINISTRADOR */}
         {isAdmin && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center shadow-sm">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 flex justify-between items-center shadow-sm max-w-md mx-auto">
             <div>
               <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
                 <Settings size={14} /> Modo Administrador
@@ -281,12 +284,12 @@ export default function App() {
           </div>
         </div>
 
-        {/* LISTA DE PRODUCTOS */}
-        <div className="space-y-3 pt-2">
+        {/* LISTA DE PRODUCTOS (1 columna en celular, 2 columnas en PC) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
           {loading ? (
-            <p className="text-center text-xs text-gray-400 py-8">Cargando menú...</p>
+            <p className="col-span-full text-center text-xs text-gray-400 py-8">Cargando menú...</p>
           ) : filteredProducts.length === 0 ? (
-            <p className="text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
+            <p className="col-span-full text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
           ) : (
             filteredProducts.map((item) => (
               <div
