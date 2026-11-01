@@ -30,8 +30,7 @@ export default function App() {
   const PHONE_NUMBER = "3884587924";
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
   const MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Emilio+Bottini+1703+Sargento+Cabral+Jujuy";
-  // Enlace del mapa OpenStreetMap centrado en las coordenadas de la zona en Jujuy
-  const IFRAME_SRC = "https://www.openstreetmap.org/export/embed.html?bbox=-65.3150000%2C-24.1950000%2C-65.2850000%2C-24.1750000&layer=mapnik&marker=-24.1856800%2C-65.3006200";
+  const IFRAME_SRC = "https://maps.google.com/maps?q=Emilio%20Bottini%201703%2C%20Sargento%20Cabral%2C%20Jujuy&t=&z=15&ie=UTF8&iwloc=&output=embed";
 
   useEffect(() => {
     fetchProducts();
@@ -425,15 +424,16 @@ export default function App() {
                   {/* MAPA VISIBLE GARANTIZADO */}
                   <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
                     <iframe
-                      title="Mapa AL PASO"
-                      src={IFRAME_SRC}
-                      width="100%"
-                      height="100%"
-                      style={{ border: 0 }}
-                      allowFullScreen=""
-                      loading="lazy"
+                    title="Mapa AL PASO"
+                    src={IFRAME_SRC}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
                     ></iframe>
-                  </div>
+                    </div>
 
                   {/* DIRECCIÓN */}
                   <div className="flex items-center gap-2">
