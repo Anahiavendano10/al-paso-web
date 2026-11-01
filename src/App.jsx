@@ -25,15 +25,16 @@ export default function App() {
   const [productNotes, setProductNotes] = useState('');
 
   // ==========================================
-  // 🔴 DATOS DE TU LOCAL EN JUJUY
+  // 🔴 CONFIGURACIÓN DE TUS DATOS REALES
   // ==========================================
-  const PHONE_NUMBER = "388718946";
+  const PHONE_NUMBER = "3885718946";
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
-  const MAPS_LINK = "https://www.google.com/maps/search/?api=1&query=Emilio+Bottini+1703+Sargento+Cabral+Jujuy";
+  const MAPS_LINK = "https://www.google.com/maps/place/%22Al+paso%22+empanaderia+y+sandwicheria/@-24.2266788,-65.2757969,19z";
   const IFRAME_SRC = "https://www.google.com/maps/embed?pb=%211m14%211m8%211m3%211d454.804006856018%212d-65.27579691485312%213d-24.226678810345796%213m2%211i1024%212i768%214f13.1%213m3%211m2%211s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5%212s%22Al%20paso%22%20empanaderia%20y%20sandwicheria%215e0%213m2%211ses-419%212sus%214v1793575439458%215m2%211ses-419%212sus";
-  // 🔴 ENLACES DE REDES SOCIALES (reemplaza con tus perfiles reales)
+
   const INSTAGRAM_LINK = "https://www.instagram.com/tu_perfil_alpaso";
   const FACEBOOK_LINK = "https://www.facebook.com/tu_pagina_alpaso";
+
   useEffect(() => {
     fetchProducts();
     if (localStorage.getItem('alpaso_admin_active') === 'true') {
@@ -80,15 +81,36 @@ export default function App() {
     setProductNotes('');
   };
 
+  // Cálculo de precio según cantidad (12 u. = $14.000 / $16.000, 6 u. = $7.000 / $8.000)
+  const calculateTotalPrice = (prod, qty) => {
+    if (!prod) return 0;
+    if (prod.category === 'Empanadas') {
+      const isEspecial = prod.name.toLowerCase().includes('champiñon') || prod.name.toLowerCase().includes('matambre');
+      const docenas = Math.floor(qty / 12);
+      const restoDocena = qty % 12;
+      const medias = Math.floor(restoDocena / 6);
+      const unidades = restoDocena % 6;
+
+      const precioDocena = isEspecial ? 16000 : 14000;
+      const precioMedia = isEspecial ? 8000 : 7000;
+      const precioUnidad = isEspecial ? 1500 : 1500;
+
+      return Math.round((docenas * precioDocena) + (medias * precioMedia) + (unidades * precioUnidad));
+    }
+    return Math.round(prod.price * qty);
+  };
+
   const addToCart = () => {
     if (!selectedProduct || productQuantity <= 0) return;
+
+    const computedTotal = calculateTotalPrice(selectedProduct, productQuantity);
 
     const itemToAdd = {
       ...selectedProduct,
       cartId: Date.now(),
       quantity: productQuantity,
       notes: selectedProduct.category === 'Sandwiches' ? productNotes : '',
-      totalPrice: selectedProduct.price * productQuantity
+      totalPrice: computedTotal
     };
 
     setCart([...cart, itemToAdd]);
@@ -313,7 +335,9 @@ export default function App() {
                     )}
                   </div>
                   <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
-                  <p className="font-black text-sm text-gray-900 mt-2">${item.price}</p>
+                  <p className="font-black text-sm text-gray-900 mt-2">
+                    ${Math.round(item.price)} {item.category === 'Empanadas' ? 'u.' : ''}
+                  </p>
                 </div>
 
                 <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
@@ -409,41 +433,35 @@ export default function App() {
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
                 <div className="flex gap-3">
-                  <a href="#" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
+                  <a href={INSTAGRAM_LINK} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
                     <Instagram size={14} /> Instagram
                   </a>
-                  <a href="#" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
+                  <a href={FACEBOOK_LINK} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
                     <Facebook size={14} /> Facebook
                   </a>
                 </div>
               </div>
 
-              {/* SECCIÓN DE UBICACIÓN */}
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
                 <div className="bg-gray-50 p-3.5 rounded-2xl space-y-3">
-                  
-                  {/* MAPA VISIBLE GARANTIZADO */}
                   <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
                     <iframe
-                    title="Mapa AL PASO"
-                    src={IFRAME_SRC}
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
+                      title="Mapa AL PASO"
+                      src={IFRAME_SRC}
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen=""
+                      loading="lazy"
                     ></iframe>
-                    </div>
+                  </div>
 
-                  {/* DIRECCIÓN */}
                   <div className="flex items-center gap-2">
                     <MapPin size={16} className="text-[#95c623] shrink-0" />
                     <span className="text-xs font-bold text-gray-800">{DIRECCION_REAL}</span>
                   </div>
 
-                  {/* BOTÓN GOOGLE MAPS */}
                   <a
                     href={MAPS_LINK}
                     target="_blank"
@@ -556,7 +574,7 @@ export default function App() {
                 }`}
               >
                 <span>Añadir</span>
-                <span>${selectedProduct.price * productQuantity}</span>
+                <span>${calculateTotalPrice(selectedProduct, productQuantity)}</span>
               </button>
             </div>
           </div>
@@ -649,30 +667,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* REDES SOCIALES */}
-      <div>
-        <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
-        <div className="flex gap-3">
-          <a
-          href={INSTAGRAM_LINK}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-1.5 bg-gray-100 px-3.5 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200 transition-all active:scale-95"
-          >
-            <Instagram size={14} /> Instagram
-          </a>
-          
-          <a
-          href={FACEBOOK_LINK}
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center gap-1.5 bg-gray-100 px-3.5 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200 transition-all active:scale-95"
-          >
-            <Facebook size={14} /> Facebook
-            </a>
-            </div>
-            </div>
 
     </div>
   );
