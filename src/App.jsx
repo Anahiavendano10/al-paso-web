@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Settings, Power, Menu, Instagram, Facebook, Info 
+  MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Star 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -27,7 +27,7 @@ export default function App() {
   // ==========================================
   // 🔴 CONFIGURACIÓN DE TUS DATOS REALES
   // ==========================================
-  const PHONE_NUMBER = "3885718946";
+  const PHONE_NUMBER = "3884587924";
   const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
   const MAPS_LINK = "https://www.google.com/maps/place/%22Al+paso%22+empanaderia+y+sandwicheria/@-24.2266788,-65.2757969,19z";
   const IFRAME_SRC = "https://www.google.com/maps/embed?pb=%211m14%211m8%211m3%211d454.804006856018%212d-65.27579691485312%213d-24.226678810345796%213m2%211i1024%212i768%214f13.1%213m3%211m2%211s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5%212s%22Al%20paso%22%20empanaderia%20y%20sandwicheria%215e0%213m2%211ses-419%212sus%214v1793575439458%215m2%211ses-419%212sus";
@@ -74,6 +74,12 @@ export default function App() {
     return matchesSearch && matchesCat;
   });
 
+  const isSpecialEmpanada = (item) => {
+    if (item.category !== 'Empanadas') return false;
+    const nameLower = item.name.toLowerCase();
+    return nameLower.includes('champiñon') || nameLower.includes('matambre');
+  };
+
   const openProductDetail = (prod) => {
     if (!prod.available) return;
     setSelectedProduct(prod);
@@ -81,11 +87,10 @@ export default function App() {
     setProductNotes('');
   };
 
-  // Cálculo de precio según cantidad (12 u. = $14.000 / $16.000, 6 u. = $7.000 / $8.000)
   const calculateTotalPrice = (prod, qty) => {
     if (!prod) return 0;
     if (prod.category === 'Empanadas') {
-      const isEspecial = prod.name.toLowerCase().includes('champiñon') || prod.name.toLowerCase().includes('matambre');
+      const isEspecial = isSpecialEmpanada(prod);
       const docenas = Math.floor(qty / 12);
       const restoDocena = qty % 12;
       const medias = Math.floor(restoDocena / 6);
@@ -93,7 +98,7 @@ export default function App() {
 
       const precioDocena = isEspecial ? 16000 : 14000;
       const precioMedia = isEspecial ? 8000 : 7000;
-      const precioUnidad = isEspecial ? 1500 : 1500;
+      const precioUnidad = isEspecial ? 1333.33 : 1500;
 
       return Math.round((docenas * precioDocena) + (medias * precioMedia) + (unidades * precioUnidad));
     }
@@ -317,53 +322,80 @@ export default function App() {
           ) : filteredProducts.length === 0 ? (
             <p className="col-span-full text-center text-xs text-gray-400 py-8">No hay productos disponibles</p>
           ) : (
-            filteredProducts.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => openProductDetail(item)}
-                className={`bg-white rounded-2xl p-3 shadow-sm border border-gray-100 flex items-center justify-between gap-3 ${
-                  item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60 bg-gray-50'
-                }`}
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
-                    {!item.available && (
-                      <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded">
-                        AGOTADO
+            filteredProducts.map((item) => {
+              const especial = isSpecialEmpanada(item);
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => openProductDetail(item)}
+                  className={`bg-white rounded-2xl p-3 shadow-sm border flex items-center justify-between gap-3 relative overflow-hidden ${
+                    especial ? 'border-amber-200 bg-gradient-to-r from-amber-50/30 to-white' : 'border-gray-100'
+                  } ${
+                    item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60 bg-gray-50'
+                  }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
+
+                      {/* BADGE ESPECIAL DE 16 MIL */}
+                      {especial && (
+                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                          <Star size={9} className="fill-amber-950" /> ESPECIAL
+                        </span>
+                      )}
+
+                      {!item.available && (
+                        <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded">
+                          AGOTADO
+                        </span>
+                      )}
+                    </div>
+
+                    <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
+                    
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="font-black text-sm text-gray-900">
+                        ${Math.round(item.price)} {item.category === 'Empanadas' ? 'u.' : ''}
                       </span>
-                    )}
+                      {especial && (
+                        <span className="text-[10px] font-extrabold text-amber-700 bg-amber-100/80 px-1.5 py-0.5 rounded-md">
+                          $16.000 doc.
+                        </span>
+                      )}
+                      {item.category === 'Empanadas' && !especial && (
+                        <span className="text-[10px] font-bold text-gray-400">
+                          $14.000 doc.
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
-                  <p className="font-black text-sm text-gray-900 mt-2">
-                    ${Math.round(item.price)} {item.category === 'Empanadas' ? 'u.' : ''}
-                  </p>
-                </div>
 
-                <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
-                  <img
-                    src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=200&auto=format&fit=crop'}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                {isAdmin && (
-                  <div className="pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      onClick={() => toggleAvailable(item.id, item.available)}
-                      className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
-                        item.available 
-                          ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                          : 'bg-green-100 text-green-700 hover:bg-green-200'
-                      }`}
-                    >
-                      {item.available ? 'Agotar' : 'Activar'}
-                    </button>
+                  <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 relative">
+                    <img
+                      src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=200&auto=format&fit=crop'}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                )}
-              </div>
-            ))
+
+                  {isAdmin && (
+                    <div className="pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => toggleAvailable(item.id, item.available)}
+                        className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
+                          item.available 
+                            ? 'bg-red-100 text-red-700 hover:bg-red-200' 
+                            : 'bg-green-100 text-green-700 hover:bg-green-200'
+                        }`}
+                      >
+                        {item.available ? 'Agotar' : 'Activar'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
 
@@ -497,7 +529,15 @@ export default function App() {
               />
             </div>
 
-            <h3 className="text-lg font-black">{selectedProduct.name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-black">{selectedProduct.name}</h3>
+              {isSpecialEmpanada(selectedProduct) && (
+                <span className="bg-amber-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Star size={10} className="fill-amber-950" /> ESPECIAL
+                </span>
+              )}
+            </div>
+
             <p className="text-xs text-gray-500 mt-1">{selectedProduct.description || selectedProduct.category}</p>
 
             {selectedProduct.category === 'Empanadas' && (
