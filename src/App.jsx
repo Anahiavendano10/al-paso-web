@@ -87,6 +87,7 @@ export default function App() {
     setIsAdmin(false);
   };
 
+  // 🔴 LISTA DE CATEGORÍAS CON EMOJIS (Menos Todos)
   const categories = [
     'Todos', 
     'Promos 🏷️', 
@@ -350,13 +351,13 @@ export default function App() {
             />
           </div>
 
-          {/* Carrusel de categorías con Desborde horizontal */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+          {/* 🔴 CATEGORÍAS EN GRID FIJO (3 por fila, 2 filas exactas) */}
+          <div className="grid grid-cols-3 gap-2 py-1">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
+                className={`w-full py-2.5 px-2 rounded-xl text-[11px] font-extrabold text-center transition-all ${
                   selectedCategory === cat
                     ? 'bg-black text-white shadow-sm'
                     : 'bg-white text-gray-700 border border-gray-100'
