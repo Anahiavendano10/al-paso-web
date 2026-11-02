@@ -87,12 +87,31 @@ export default function App() {
     setIsAdmin(false);
   };
 
-  // 🔴 LISTA DE CATEGORÍAS ACTUALIZADA (con Promos y Hamburguesas)
-  const categories = ['Todos', 'Promos', 'Empanadas', 'Sandwiches', 'Hamburguesas', 'Bebidas'];
+  const categories = [
+    'Todos', 
+    'Promos 🏷️', 
+    'Empanadas 🥟', 
+    'Sándwiches 🥪', 
+    'Hamburguesas 🍔', 
+    'Bebidas 🥤'
+  ];
   
   const filteredProducts = products.filter(p => {
     const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;
+    
+    const baseSelectedCat = selectedCategory.split(' ')[0].toLowerCase()
+      .replace('sándwiches', 'sandwiches') 
+      .replace('promos', 'promos')
+      .replace('hamburguesas', 'hamburguesas')
+      .replace('empanadas', 'empanadas')
+      .replace('bebidas', 'bebidas');
+
+    const baseProductCat = (p.category || '').toLowerCase()
+      .replace('sándwiches', 'sandwiches')
+      .replace('sandwiches', 'sandwiches');
+
+    const matchesCat = selectedCategory === 'Todos' || baseProductCat === baseSelectedCat;
+    
     return matchesSearch && matchesCat;
   });
 
@@ -102,7 +121,6 @@ export default function App() {
     return nameLower.includes('champi') || nameLower.includes('matambre');
   };
 
-  // 1 unidad para Sándwiches, Hamburguesas y Bebidas, 0 para empanadas y promos (para mayor control)
   const openProductDetail = (prod) => {
     if (!prod.available) return;
     setSelectedProduct(prod);
@@ -112,7 +130,6 @@ export default function App() {
     setProductNotes('');
   };
 
-  // Cálculo: $1.500 cada unidad, aplica promo si alcanza docenas/medias docenas (solo en Empanadas)
   const calculateTotalPrice = (prod, qty) => {
     if (!prod) return 0;
     if (prod.category === 'Empanadas') {
@@ -358,7 +375,7 @@ export default function App() {
           ) : filteredProducts.length === 0 ? (
             <div className="col-span-full text-center py-8 space-y-3">
               <p className="text-xs text-gray-400">No hay productos disponibles en esta sección</p>
-              {selectedCategory === 'Empanadas' && (
+              {selectedCategory.includes('Empanadas') && (
                 <button
                   onClick={seedEmpanadasInSupabase}
                   className="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"
@@ -560,7 +577,7 @@ export default function App() {
 
       {/* MODAL DETALLE DE PRODUCTO */}
       {selectedProduct && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm animate-fade-in">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
             <button
               onClick={() => setSelectedProduct(null)}
@@ -570,7 +587,7 @@ export default function App() {
             </button>
 
             {/* Imagen del producto */}
-            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative animate-fade-in">
+            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
               <img
                 src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
                 alt={selectedProduct.name}
@@ -606,9 +623,9 @@ export default function App() {
 
             {/* Selección de cantidad rápida (Empanadas) */}
             {selectedProduct.category === 'Empanadas' && (
-              <div className="mt-4 pt-3 border-t border-gray-100">
+              <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
                 <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
-                <div className="grid grid-cols-3 gap-2 text-center animate-fade-in">
+                <div className="grid grid-cols-3 gap-2 text-center">
                   
                   {/* +1 Unidad */}
                   <div>
