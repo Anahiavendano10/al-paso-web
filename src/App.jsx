@@ -178,7 +178,7 @@ export default function App() {
 
   const totalCartPrice = cart.reduce((acc, item) => acc + item.totalPrice, 0);
 
-  // ALTERNAR AGOTADO / DISPONIBLE
+  // ALTERNAR AGOTADO EN SUPABASE
   const toggleAvailable = async (id, currentStatus) => {
     const { error } = await supabase.from('products').update({ available: !currentStatus }).eq('id', id);
     if (!error) {
@@ -186,7 +186,7 @@ export default function App() {
     }
   };
 
-  // ALTERNAR DESTACADO
+  // ALTERNAR DESTACADO EN SUPABASE
   const toggleFeatured = async (id, currentFeatured) => {
     const { error } = await supabase.from('products').update({ is_featured: !currentFeatured }).eq('id', id);
     if (!error) {
@@ -489,25 +489,29 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* BOTONES SOLO EN MODO ADMINISTRADOR: AGOTADO Y DESTACADO */}
+                  {/* BOTONES SOLO EN MODO ADMINISTRADOR: UNO DEBAJO DEL OTRO, IGUAL TAMAÑO Y FORMA */}
                   {isAdmin && (
-                    <div className="px-4 pb-3 border-t border-gray-100 pt-2 flex justify-between items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="px-4 pb-4 border-t border-gray-100 pt-3 flex flex-col gap-2 items-center" onClick={(e) => e.stopPropagation()}>
+                      {/* BOTÓN DESTACAR (AMARILLO) */}
                       <button
                         onClick={() => toggleFeatured(item.id, item.is_featured)}
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1 transition-all ${
+                        className={`w-full max-w-[150px] py-2 px-3 rounded-full text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-xs ${
                           item.is_featured 
-                            ? 'bg-amber-400 text-black shadow-xs' 
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-amber-400 text-black border border-amber-500' 
+                            : 'bg-amber-100/70 text-amber-900 border border-amber-300 hover:bg-amber-200'
                         }`}
                       >
-                        <Star size={11} className={item.is_featured ? 'fill-black' : ''} />
+                        <Star size={13} className={item.is_featured ? 'fill-black' : ''} />
                         {item.is_featured ? 'Destacado' : 'Destacar'}
                       </button>
 
+                      {/* BOTÓN AGOTAR / ACTIVAR (ROJO) */}
                       <button
                         onClick={() => toggleAvailable(item.id, item.available)}
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${
-                          item.available ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-black text-white'
+                        className={`w-full max-w-[150px] py-2 px-3 rounded-full text-xs font-black text-white transition-all shadow-xs ${
+                          item.available 
+                            ? 'bg-red-500 hover:bg-red-600' 
+                            : 'bg-gray-800 hover:bg-black'
                         }`}
                       >
                         {item.available ? 'Agotar' : 'Activar'}
