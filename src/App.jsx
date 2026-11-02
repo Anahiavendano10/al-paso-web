@@ -221,7 +221,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* SIGNO DE INFORMACIÓN (i) PARA MÁS INFORMACIÓN */}
             <button
               onClick={() => setIsInfoModalOpen(true)}
               style={{ backgroundColor: '#95c623' }}
@@ -250,7 +249,6 @@ export default function App() {
               </button>
             )}
 
-            {/* CARRITO ORIGINAL EN VERDE LIMA */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
@@ -266,9 +264,8 @@ export default function App() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
 
-        {/* TARJETA CON IMAGEN DE FONDO DETRÁS Y ESTILOS ORIGINALES NEGROS */}
+        {/* TARJETA CON IMAGEN DE FONDO DETRÁS */}
         <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md max-w-md mx-auto">
-          {/* Imagen de fondo detrás */}
           <div className="h-44 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
@@ -277,14 +274,12 @@ export default function App() {
             />
           </div>
 
-          {/* Tarjeta flotante negra superpuesta */}
           <div className="p-3 bg-transparent -mt-20 relative z-10">
             <div className="bg-[#121212] rounded-[1.8rem] p-5 shadow-2xl text-white space-y-3 border border-white/10">
               
               <div className="flex justify-between items-center">
                 <h2 className="text-3xl font-black tracking-tight text-white uppercase">AL PASO</h2>
                 
-                {/* BOTÓN O INDICADOR ABIERTO/CERRADO */}
                 <span style={{ backgroundColor: isOpenLocal ? '#95c623' : '#ef4444' }} className="text-black px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
                   {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
                 </span>
@@ -299,10 +294,7 @@ export default function App() {
                 <span>{DIRECCION_REAL}</span>
               </div>
 
-              {/* BOTONES INFERIORES: RETIRO PRIMERO, DELIVERY SEGUNDO */}
               <div className="grid grid-cols-2 gap-3 pt-2">
-                
-                {/* 1° RETIRO */}
                 <button
                   className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 border transition-all ${
                     isRetiroAvailable
@@ -313,7 +305,6 @@ export default function App() {
                   🛍️ Retiro {!isRetiroAvailable && <span className="text-[10px] font-normal">(No disponible)</span>}
                 </button>
 
-                {/* 2° DELIVERY */}
                 <button
                   style={{ backgroundColor: isDeliveryAvailable ? '#95c623' : '#1e1e1e' }}
                   className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm transition-all ${
@@ -324,13 +315,12 @@ export default function App() {
                 >
                   🛵 Delivery {!isDeliveryAvailable && <span className="text-[10px] font-normal">(No disponible)</span>}
                 </button>
-
               </div>
             </div>
           </div>
         </div>
 
-        {/* PANEL MODO ADMINISTRADOR (MANTIENE SWITCH DE ESTADO, DELIVERY Y RETIRO) */}
+        {/* MODO ADMINISTRADOR */}
         {isAdmin && (
           <div className="bg-white border-2 border-black rounded-2xl p-4 space-y-3 shadow-sm">
             <div className="flex justify-between items-center border-b pb-2">
@@ -352,7 +342,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* OPCIONES DE DISPONIBILIDAD DELIVERY / RETIRO */}
             <div className="grid grid-cols-2 gap-2 pt-1">
               <button
                 onClick={() => setIsRetiroAvailable(!isRetiroAvailable)}
@@ -399,19 +388,19 @@ export default function App() {
             />
           </div>
 
-          {/* GRID DE CATEGORÍAS */}
+          {/* GRID DE CATEGORÍAS (MEDIDAS IDÉNTICAS PARA AMBAS FILAS) */}
           <div className="grid grid-cols-3 gap-2 py-1">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`w-full py-2.5 px-2 rounded-2xl text-[12px] font-extrabold text-center transition-all ${
+                className={`w-full h-12 px-1 rounded-2xl text-[11px] font-extrabold text-center flex items-center justify-center transition-all ${
                   selectedCategory === cat
                     ? 'bg-[#121212] text-[#95c623] shadow-md'
                     : 'bg-white text-black hover:bg-gray-50'
                 }`}
               >
-                {cat}
+                <span className="truncate">{cat}</span>
               </button>
             ))}
           </div>
@@ -817,37 +806,40 @@ export default function App() {
       {/* MODAL PIN ADMIN */}
       {isPinModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl">
+          <div style={{ backgroundColor: '#E8Edd6' }} className="w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl border border-black/10">
             <button
               onClick={() => { setIsPinModalOpen(false); setPinError(''); setPin(''); }}
-              className="absolute top-4 right-4 text-gray-400"
+              className="absolute top-4 right-4 text-gray-500 hover:text-black"
             >
               <X size={18} />
             </button>
 
-            <div style={{ backgroundColor: '#95c623' }} className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 text-black">
-              <Lock size={20} />
+            <div style={{ backgroundColor: '#95c623' }} className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-black shadow-sm">
+              <Lock size={22} />
             </div>
 
-            <h3 className="font-black text-sm text-black">Acceso Administrador</h3>
-            <p className="text-[11px] text-gray-400 mb-4">Ingresa tu clave de dueño</p>
+            <h3 className="font-black text-base text-black">Acceso Administrador</h3>
+            <p className="text-xs text-gray-600 mb-4">Ingresa tu clave de dueño</p>
 
             <form onSubmit={handlePinSubmit} className="space-y-3">
               <input
                 type="password"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 maxLength={4}
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="****"
-                className="w-full text-center text-xl font-black p-2 border-2 border-black rounded-xl outline-none"
+                className="w-full text-center text-2xl font-black p-3 bg-white border-2 border-black rounded-2xl outline-none text-black tracking-widest shadow-inner"
                 autoFocus
               />
 
-              {pinError && <p className="text-xs text-red-500 font-bold">{pinError}</p>}
+              {pinError && <p className="text-xs text-red-600 font-bold">{pinError}</p>}
 
               <button
                 type="submit"
-                className="w-full bg-black text-white py-2.5 rounded-xl font-black text-xs"
+                style={{ backgroundColor: '#121212' }}
+                className="w-full text-[#95c623] py-3 rounded-2xl font-black text-xs shadow-md active:scale-95 transition-all hover:bg-black"
               >
                 Ingresar
               </button>
