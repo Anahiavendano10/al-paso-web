@@ -61,8 +61,8 @@ export default function App() {
       { name: 'Empanada Pollo y Jamón', description: 'Pollo tierno con trozos de jamón cocido', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
       { name: 'Empanada de Osobuco', description: 'Osobuco braseado lentamente', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
       { name: 'Empanada Árabe', description: 'Carne marinada con limón y especias orientales', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada Pollo al Champiñón', description: 'Pollo en salsa de champiñones a la crema', price: 1333.33, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada de Matambre', description: 'Matambre tierno tiernizado y condimentado', price: 1333.33, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' }
+      { name: 'Empanada Pollo al Champiñón', description: 'Pollo en salsa de champiñones a la crema', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Matambre', description: 'Matambre tierno tiernizado y condimentado', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' }
     ];
 
     await supabase.from('products').insert(empanadasList);
@@ -119,7 +119,7 @@ export default function App() {
 
       const precioDocena = isEspecial ? 16000 : 14000;
       const precioMedia = isEspecial ? 8000 : 7000;
-      const precioUnidad = isEspecial ? 1333.33 : 1500;
+      const precioUnidad = isEspecial ? 1500: 1500;
 
       return Math.round((docenas * precioDocena) + (medias * precioMedia) + (unidades * precioUnidad));
     }
