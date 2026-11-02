@@ -100,10 +100,11 @@ export default function App() {
     return nameLower.includes('champi') || nameLower.includes('matambre');
   };
 
+  // 1 unidad para Sándwiches y Bebidas, 0 para empanadas
   const openProductDetail = (prod) => {
     if (!prod.available) return;
     setSelectedProduct(prod);
-    setProductQuantity(0);
+    setProductQuantity(prod.category === 'Empanadas' ? 0 : 1);
     setProductNotes('');
   };
 
@@ -378,7 +379,7 @@ export default function App() {
 
                       {/* BADGE ESPECIAL ⭐ */}
                       {especial && (
-                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs animate-pulse">
+                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
                           <Star size={9} className="fill-amber-950" /> ESPECIAL
                         </span>
                       )}
@@ -556,13 +557,13 @@ export default function App() {
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 transition-all"
+              className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 transition-all z-10"
             >
               <X size={18} />
             </button>
 
             {/* Imagen del producto */}
-            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
+            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative animate-fade-in">
               <img
                 src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
                 alt={selectedProduct.name}
@@ -596,11 +597,11 @@ export default function App() {
               )}
             </div>
 
-            {/* Selección de cantidad rápida */}
+            {/* Selección de cantidad rápida (Empanadas) */}
             {selectedProduct.category === 'Empanadas' && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
-                <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="grid grid-cols-3 gap-2 text-center animate-fade-in">
                   
                   {/* +1 Unidad */}
                   <div>
@@ -648,7 +649,7 @@ export default function App() {
 
             {/* Sándwiches - Agregar Notas */}
             {selectedProduct.category === 'Sandwiches' && (
-              <div className="mt-4 pt-3 border-t border-gray-100">
+              <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
                 <label className="block text-xs font-bold text-gray-700 mb-1.5">
                   Aderezos y verduras adicionales:
                 </label>
