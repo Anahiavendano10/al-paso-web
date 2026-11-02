@@ -87,7 +87,9 @@ export default function App() {
     setIsAdmin(false);
   };
 
-  const categories = ['Todos', 'Empanadas', 'Sandwiches', 'Bebidas'];
+  // 🔴 LISTA DE CATEGORÍAS ACTUALIZADA (con Promos y Hamburguesas)
+  const categories = ['Todos', 'Promos', 'Empanadas', 'Sandwiches', 'Hamburguesas', 'Bebidas'];
+  
   const filteredProducts = products.filter(p => {
     const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCat = selectedCategory === 'Todos' || p.category === selectedCategory;
@@ -100,15 +102,17 @@ export default function App() {
     return nameLower.includes('champi') || nameLower.includes('matambre');
   };
 
-  // 1 unidad para Sándwiches y Bebidas, 0 para empanadas
+  // 1 unidad para Sándwiches, Hamburguesas y Bebidas, 0 para empanadas y promos (para mayor control)
   const openProductDetail = (prod) => {
     if (!prod.available) return;
     setSelectedProduct(prod);
-    setProductQuantity(prod.category === 'Empanadas' ? 0 : 1);
+    
+    const qtyInicial = (prod.category === 'Empanadas' || prod.category === 'Promos') ? 0 : 1;
+    setProductQuantity(qtyInicial);
     setProductNotes('');
   };
 
-  // Cálculo: $1.500 cada unidad, aplica promo si alcanza docenas/medias docenas
+  // Cálculo: $1.500 cada unidad, aplica promo si alcanza docenas/medias docenas (solo en Empanadas)
   const calculateTotalPrice = (prod, qty) => {
     if (!prod) return 0;
     if (prod.category === 'Empanadas') {
@@ -136,7 +140,7 @@ export default function App() {
       ...selectedProduct,
       cartId: Date.now(),
       quantity: productQuantity,
-      notes: selectedProduct.category === 'Sandwiches' ? productNotes : '',
+      notes: (selectedProduct.category === 'Sandwiches' || selectedProduct.category === 'Hamburguesas') ? productNotes : '',
       totalPrice: computedTotal
     };
 
@@ -329,6 +333,7 @@ export default function App() {
             />
           </div>
 
+          {/* Carrusel de categorías con Desborde horizontal */}
           <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
             {categories.map((cat) => (
               <button
@@ -353,12 +358,14 @@ export default function App() {
           ) : filteredProducts.length === 0 ? (
             <div className="col-span-full text-center py-8 space-y-3">
               <p className="text-xs text-gray-400">No hay productos disponibles en esta sección</p>
-              <button
-                onClick={seedEmpanadasInSupabase}
-                className="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"
-              >
-                <RefreshCw size={12} /> Cargar todas las empanadas ahora
-              </button>
+              {selectedCategory === 'Empanadas' && (
+                <button
+                  onClick={seedEmpanadasInSupabase}
+                  className="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5"
+                >
+                  <RefreshCw size={12} /> Cargar todas las empanadas ahora
+                </button>
+              )}
             </div>
           ) : (
             filteredProducts.map((item) => {
@@ -379,7 +386,7 @@ export default function App() {
 
                       {/* BADGE ESPECIAL ⭐ */}
                       {especial && (
-                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs animate-pulse">
                           <Star size={9} className="fill-amber-950" /> ESPECIAL
                         </span>
                       )}
@@ -647,8 +654,8 @@ export default function App() {
               </div>
             )}
 
-            {/* Sándwiches - Agregar Notas */}
-            {selectedProduct.category === 'Sandwiches' && (
+            {/* Sándwiches y Hamburguesas - Agregar Notas */}
+            {(selectedProduct.category === 'Sandwiches' || selectedProduct.category === 'Hamburguesas') && (
               <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
                 <label className="block text-xs font-bold text-gray-700 mb-1.5">
                   Aderezos y verduras adicionales:
