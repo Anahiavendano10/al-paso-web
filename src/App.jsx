@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
+  Lock, LogOut, Search, ShoppingCart, Plus, Minus, X, 
   MapPin, Settings, Power, Menu, Instagram, Facebook, Star, RefreshCw 
 } from 'lucide-react';
 import { supabase } from './supabase';
@@ -240,13 +240,13 @@ export default function App() {
               </button>
             )}
 
-            {/* CARRITO EN FORMA DE PÍLDORA VERDE LIMA DE LA VERSIÓN ANTERIOR */}
+            {/* NUEVO ÍCONO DE CARRITO DE SUPERMERCADO */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
               className="text-black px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-black text-xs shadow-sm hover:opacity-95 transition-all"
             >
-              <ShoppingBag size={16} className="fill-black stroke-black" />
+              <ShoppingCart size={16} className="stroke-[2.5]" />
               <span>{cart.length}</span>
             </button>
           </div>
@@ -289,7 +289,7 @@ export default function App() {
               {/* BOTONES INFERIORES: RETIRO EN VERDE Y DELIVERY SEGUNDO */}
               <div className="grid grid-cols-2 gap-3 pt-2">
                 
-                {/* 1° RETIRO EN VERDE LIMA (#95c623) */}
+                {/* 1° RETIRO EN VERDE LIMA */}
                 <button
                   style={{ backgroundColor: isRetiroAvailable ? '#95c623' : '#1e1e1e' }}
                   className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all ${
