@@ -50,7 +50,9 @@ export default function App() {
   const fetchProducts = async () => {
     setLoading(true);
     const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true });
-    if (!error && data) setProducts(data);
+    if (!error && data) {
+      setProducts(data);
+    }
     setLoading(false);
   };
 
@@ -122,7 +124,7 @@ export default function App() {
 
   const isSpecialEmpanada = (item) => {
     if (!item) return false;
-    if (item.is_featured) return true;
+    if (item.is_featured === true) return true;
     if (item.category !== 'Empanadas') return false;
     const nameLower = item.name.toLowerCase();
     return nameLower.includes('champi') || nameLower.includes('matambre');
@@ -178,19 +180,27 @@ export default function App() {
 
   const totalCartPrice = cart.reduce((acc, item) => acc + item.totalPrice, 0);
 
-  // ALTERNAR AGOTADO EN SUPABASE
+  // ALTERNAR AGOTADO / DISPONIBLE EN SUPABASE
   const toggleAvailable = async (id, currentStatus) => {
-    const { error } = await supabase.from('products').update({ available: !currentStatus }).eq('id', id);
-    if (!error) {
-      setProducts(products.map(p => p.id === id ? { ...p, available: !p.available } : p));
+    const nextStatus = !currentStatus;
+    setProducts(products.map(p => p.id === id ? { ...p, available: nextStatus } : p));
+    
+    const { error } = await supabase.from('products').update({ available: nextStatus }).eq('id', id);
+    if (error) {
+      console.error("Error al actualizar estado disponible en Supabase:", error);
+      fetchProducts();
     }
   };
 
   // ALTERNAR DESTACADO EN SUPABASE
   const toggleFeatured = async (id, currentFeatured) => {
-    const { error } = await supabase.from('products').update({ is_featured: !currentFeatured }).eq('id', id);
-    if (!error) {
-      setProducts(products.map(p => p.id === id ? { ...p, is_featured: !p.is_featured } : p));
+    const nextFeatured = !(currentFeatured === true);
+    setProducts(products.map(p => p.id === id ? { ...p, is_featured: nextFeatured } : p));
+
+    const { error } = await supabase.from('products').update({ is_featured: nextFeatured }).eq('id', id);
+    if (error) {
+      console.error("Error al actualizar destacado en Supabase:", error);
+      fetchProducts();
     }
   };
 
@@ -489,32 +499,34 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* BOTONES SOLO EN MODO ADMINISTRADOR: UNO DEBAJO DEL OTRO, IGUAL TAMAÑO Y FORMA */}
+                  {/* BOTONES MODO ADMIN: UNO AL LADO DEL OTRO (AGOTADO A LA IZQ, DESTACAR A LA DER) */}
                   {isAdmin && (
-                    <div className="px-4 pb-4 border-t border-gray-100 pt-3 flex flex-col gap-2 items-center" onClick={(e) => e.stopPropagation()}>
-                      {/* BOTÓN DESTACAR (AMARILLO) */}
+                    <div className="px-4 pb-4 border-t border-gray-100 pt-3 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+                      {/* 1° BOTÓN AGOTAR / ACTIVAR (ROJO A LA IZQUIERDA) */}
                       <button
-                        onClick={() => toggleFeatured(item.id, item.is_featured)}
-                        className={`w-full max-w-[150px] py-2 px-3 rounded-full text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-xs ${
-                          item.is_featured 
-                            ? 'bg-amber-400 text-black border border-amber-500' 
-                            : 'bg-amber-100/70 text-amber-900 border border-amber-300 hover:bg-amber-200'
-                        }`}
-                      >
-                        <Star size={13} className={item.is_featured ? 'fill-black' : ''} />
-                        {item.is_featured ? 'Destacado' : 'Destacar'}
-                      </button>
-
-                      {/* BOTÓN AGOTAR / ACTIVAR (ROJO) */}
-                      <button
+                        type="button"
                         onClick={() => toggleAvailable(item.id, item.available)}
-                        className={`w-full max-w-[150px] py-2 px-3 rounded-full text-xs font-black text-white transition-all shadow-xs ${
+                        className={`w-full py-2 px-2 rounded-full text-xs font-black text-white transition-all shadow-xs text-center ${
                           item.available 
                             ? 'bg-red-500 hover:bg-red-600' 
                             : 'bg-gray-800 hover:bg-black'
                         }`}
                       >
                         {item.available ? 'Agotar' : 'Activar'}
+                      </button>
+
+                      {/* 2° BOTÓN DESTACAR (AMARILLO A LA DERECHA) */}
+                      <button
+                        type="button"
+                        onClick={() => toggleFeatured(item.id, item.is_featured)}
+                        className={`w-full py-2 px-2 rounded-full text-xs font-black flex items-center justify-center gap-1 transition-all shadow-xs ${
+                          item.is_featured 
+                            ? 'bg-amber-400 text-black border border-amber-500' 
+                            : 'bg-amber-100/70 text-amber-900 border border-amber-300 hover:bg-amber-200'
+                        }`}
+                      >
+                        <Star size={12} className={item.is_featured ? 'fill-black' : ''} />
+                        {item.is_featured ? 'Destacado' : 'Destacar'}
                       </button>
                     </div>
                   )}
