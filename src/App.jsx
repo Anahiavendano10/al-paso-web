@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
-  MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Star, RefreshCw 
+  MapPin, Settings, Power, Menu, Instagram, Facebook, Star, RefreshCw 
 } from 'lucide-react';
 import { supabase } from './supabase';
 
@@ -16,7 +16,7 @@ export default function App() {
   
   // Estado del local y servicios (Configurables desde Admin)
   const [isOpenLocal, setIsOpenLocal] = useState(true);
-  const [isDeliveryAvailable, setIsDeliveryAvailable] = useState(false); // Por defecto "No disponible"
+  const [isDeliveryAvailable, setIsDeliveryAvailable] = useState(false);
   const [isRetiroAvailable, setIsRetiroAvailable] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -221,15 +221,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsInfoModalOpen(true)}
-              style={{ backgroundColor: '#95c623' }}
-              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-serif font-black text-black hover:opacity-90"
-              title="Más Información"
-            >
-              i
-            </button>
-
             {isAdmin ? (
               <button
                 onClick={handleLogout}
@@ -249,6 +240,7 @@ export default function App() {
               </button>
             )}
 
+            {/* CARRITO EN FORMA DE PÍLDORA VERDE LIMA DE LA VERSIÓN ANTERIOR */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
@@ -294,17 +286,22 @@ export default function App() {
                 <span>{DIRECCION_REAL}</span>
               </div>
 
+              {/* BOTONES INFERIORES: RETIRO EN VERDE Y DELIVERY SEGUNDO */}
               <div className="grid grid-cols-2 gap-3 pt-2">
+                
+                {/* 1° RETIRO EN VERDE LIMA (#95c623) */}
                 <button
-                  className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 border transition-all ${
+                  style={{ backgroundColor: isRetiroAvailable ? '#95c623' : '#1e1e1e' }}
+                  className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all ${
                     isRetiroAvailable
-                      ? 'bg-[#1e1e1e] border-white/10 text-white'
-                      : 'bg-black/40 border-white/5 text-gray-500 opacity-60'
+                      ? 'text-black shadow-sm'
+                      : 'border border-white/10 text-gray-500 opacity-60'
                   }`}
                 >
                   🛍️ Retiro {!isRetiroAvailable && <span className="text-[10px] font-normal">(No disponible)</span>}
                 </button>
 
+                {/* 2° DELIVERY */}
                 <button
                   style={{ backgroundColor: isDeliveryAvailable ? '#95c623' : '#1e1e1e' }}
                   className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm transition-all ${
@@ -388,7 +385,7 @@ export default function App() {
             />
           </div>
 
-          {/* GRID DE CATEGORÍAS (MEDIDAS IDÉNTICAS PARA AMBAS FILAS) */}
+          {/* GRID DE CATEGORÍAS */}
           <div className="grid grid-cols-3 gap-2 py-1">
             {categories.map((cat) => (
               <button
