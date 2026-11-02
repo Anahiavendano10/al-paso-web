@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Lock, LogOut, Search, ShoppingCart, Plus, Minus, X, 
+  Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
   MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Star, RefreshCw 
 } from 'lucide-react';
 import { supabase } from './supabase';
@@ -33,7 +33,7 @@ export default function App() {
   // 🔴 DATOS DEL LOCAL
   // ==========================================
   const PHONE_NUMBER = "3884587924";
-  const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
+  const DIRECCION_REAL = "Emilio Bottini 1703, Sargento Cabral, Jujuy";
   const MAPS_LINK = "https://www.google.com/maps/place/%22Al+paso%22+empanaderia+y+sandwicheria/@-24.2266788,-65.2757969,19z";
   const IFRAME_SRC = "https://www.google.com/maps/embed?pb=%211m14%211m8%211m3%211d454.804006856018%212d-65.27579691485312%213d-24.226678810345796%213m2%211i1024%212i768%214f13.1%213m3%211m2%211s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5%212s%22Al%20paso%22%20empanaderia%20y%20sandwicheria%215e0%213m2%211ses-419%212sus%214v1793575439458%215m2%211ses-419%212sus";
 
@@ -220,7 +220,17 @@ export default function App() {
             <span className={`w-3 h-3 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* SIGNO DE INFORMACIÓN (i) PARA MÁS INFORMACIÓN */}
+            <button
+              onClick={() => setIsInfoModalOpen(true)}
+              style={{ backgroundColor: '#95c623' }}
+              className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-serif font-black text-black hover:opacity-90"
+              title="Más Información"
+            >
+              i
+            </button>
+
             {isAdmin ? (
               <button
                 onClick={handleLogout}
@@ -240,19 +250,14 @@ export default function App() {
               </button>
             )}
 
-            {/* NUEVO ÍCONO DE CARRITO DE SUPERMERCADO VISIBLE Y CLARO */}
+            {/* CARRITO ORIGINAL EN VERDE LIMA */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
-              className="text-black p-2.5 rounded-full flex items-center justify-center relative shadow-sm hover:opacity-95 transition-all active:scale-95"
-              title="Ver Carrito"
+              className="text-black px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-black text-xs shadow-sm hover:opacity-95 transition-all"
             >
-              <ShoppingCart size={20} className="stroke-[2.5]" />
-              {cart.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-[#95c623]">
-                  {cart.length}
-                </span>
-              )}
+              <ShoppingBag size={16} className="fill-black stroke-black" />
+              <span>{cart.length}</span>
             </button>
           </div>
         </div>
@@ -261,7 +266,7 @@ export default function App() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
 
-        {/* TARJETA FLOTANTE DE LA PORTADA (ESTILO EXACTO DE LA IMAGEN) */}
+        {/* TARJETA CON IMAGEN DE FONDO DETRÁS Y ESTILOS ORIGINALES NEGROS */}
         <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md max-w-md mx-auto">
           {/* Imagen de fondo detrás */}
           <div className="h-44 relative overflow-hidden">
@@ -272,72 +277,60 @@ export default function App() {
             />
           </div>
 
-          {/* Tarjeta clarita flotante superpuesta */}
-          <div className="p-3 bg-transparent -mt-24 relative z-10">
-            <div style={{ backgroundColor: '#E8Edd6' }} className="rounded-[1.8rem] p-5 shadow-2xl text-black space-y-3 border border-black/10">
+          {/* Tarjeta flotante negra superpuesta */}
+          <div className="p-3 bg-transparent -mt-20 relative z-10">
+            <div className="bg-[#121212] rounded-[1.8rem] p-5 shadow-2xl text-white space-y-3 border border-white/10">
               
-              {/* AL PASO + SIGNO DE INFORMACIÓN (i) */}
               <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-black tracking-tight text-black uppercase">AL PASO</h2>
-                <button
-                  onClick={() => setIsInfoModalOpen(true)}
-                  className="w-8 h-8 bg-black/10 rounded-full flex items-center justify-center text-black hover:bg-black/20 transition-all"
-                >
-                  <Info size={20} />
-                </button>
+                <h2 className="text-3xl font-black tracking-tight text-white uppercase">AL PASO</h2>
+                
+                {/* BOTÓN O INDICADOR ABIERTO/CERRADO */}
+                <span style={{ backgroundColor: isOpenLocal ? '#95c623' : '#ef4444' }} className="text-black px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+                  {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
+                </span>
               </div>
 
-              <p className="text-xs font-extrabold text-black/80 tracking-wide uppercase">
+              <p className="text-xs font-extrabold text-gray-300 tracking-widest uppercase">
                 EMPANADERÍA Y SÁNDWICHERÍA
               </p>
 
-              <div className="flex items-center gap-1.5 text-xs text-black/80 font-bold uppercase">
-                <MapPin size={16} className="shrink-0 text-black" />
+              <div className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
+                <MapPin size={16} style={{ color: '#95c623' }} className="shrink-0" />
                 <span>{DIRECCION_REAL}</span>
               </div>
 
-              {/* LÍNEA INFERIOR: ESTADO ABIERTO + RETIRO + DELIVERY */}
-              <div className="flex items-center justify-between pt-3 border-t border-black/10 flex-wrap gap-2">
+              {/* BOTONES INFERIORES: RETIRO PRIMERO, DELIVERY SEGUNDO */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
                 
-                {/* Abierto / Cerrado */}
-                <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${isOpenLocal ? 'bg-green-600' : 'bg-red-500'}`} />
-                  <span className="font-extrabold text-sm text-black">
-                    {isOpenLocal ? 'Abierto' : 'Cerrado'}
-                  </span>
-                </div>
+                {/* 1° RETIRO */}
+                <button
+                  className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 border transition-all ${
+                    isRetiroAvailable
+                      ? 'bg-[#1e1e1e] border-white/10 text-white'
+                      : 'bg-black/40 border-white/5 text-gray-500 opacity-60'
+                  }`}
+                >
+                  🛍️ Retiro {!isRetiroAvailable && <span className="text-[10px] font-normal">(No disponible)</span>}
+                </button>
 
-                {/* RETIRO PRIMERO Y DELIVERY DESPUÉS */}
-                <div className="flex items-center gap-1.5">
-                  {/* RETIRO */}
-                  <span 
-                    className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
-                      isRetiroAvailable 
-                        ? 'bg-black/10 text-black' 
-                        : 'bg-gray-300 text-gray-500 opacity-60'
-                    }`}
-                  >
-                    🛍️ Retiro {!isRetiroAvailable && <span className="text-[9px] font-normal">(No disp.)</span>}
-                  </span>
-
-                  {/* DELIVERY */}
-                  <span 
-                    className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
-                      isDeliveryAvailable 
-                        ? 'bg-[#95c623] text-black' 
-                        : 'bg-black/10 text-gray-600 opacity-70'
-                    }`}
-                  >
-                    🛵 Delivery {!isDeliveryAvailable && <span className="text-[9px] font-normal">(No disp.)</span>}
-                  </span>
-                </div>
+                {/* 2° DELIVERY */}
+                <button
+                  style={{ backgroundColor: isDeliveryAvailable ? '#95c623' : '#1e1e1e' }}
+                  className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm transition-all ${
+                    isDeliveryAvailable
+                      ? 'text-black'
+                      : 'border border-white/10 text-gray-400 opacity-70'
+                  }`}
+                >
+                  🛵 Delivery {!isDeliveryAvailable && <span className="text-[10px] font-normal">(No disponible)</span>}
+                </button>
 
               </div>
             </div>
           </div>
         </div>
 
-        {/* MODO ADMINISTRADOR (CON CONFIGURACIÓN DE DELIVERY Y RETIRO) */}
+        {/* PANEL MODO ADMINISTRADOR (MANTIENE SWITCH DE ESTADO, DELIVERY Y RETIRO) */}
         {isAdmin && (
           <div className="bg-white border-2 border-black rounded-2xl p-4 space-y-3 shadow-sm">
             <div className="flex justify-between items-center border-b pb-2">
@@ -345,7 +338,7 @@ export default function App() {
                 <span className="font-extrabold text-xs text-black flex items-center gap-1">
                   <Settings size={14} /> Panel de Administración
                 </span>
-                <p className="text-[10px] text-gray-600">Configura el estado general de tu tienda</p>
+                <p className="text-[10px] text-gray-600">Configura el estado de atención de AL PASO</p>
               </div>
 
               <button
@@ -359,19 +352,8 @@ export default function App() {
               </button>
             </div>
 
-            {/* CONTROLES DE DELIVERY Y RETIRO DESDE ADMIN */}
+            {/* OPCIONES DE DISPONIBILIDAD DELIVERY / RETIRO */}
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                onClick={() => setIsDeliveryAvailable(!isDeliveryAvailable)}
-                className={`py-2 px-3 rounded-xl text-xs font-extrabold border transition-all ${
-                  isDeliveryAvailable 
-                    ? 'bg-green-100 border-green-500 text-green-900' 
-                    : 'bg-red-50 border-red-300 text-red-700'
-                }`}
-              >
-                🛵 Delivery: {isDeliveryAvailable ? 'Disponible' : 'No disponible'}
-              </button>
-
               <button
                 onClick={() => setIsRetiroAvailable(!isRetiroAvailable)}
                 className={`py-2 px-3 rounded-xl text-xs font-extrabold border transition-all ${
@@ -381,6 +363,17 @@ export default function App() {
                 }`}
               >
                 🛍️ Retiro: {isRetiroAvailable ? 'Disponible' : 'No disponible'}
+              </button>
+
+              <button
+                onClick={() => setIsDeliveryAvailable(!isDeliveryAvailable)}
+                className={`py-2 px-3 rounded-xl text-xs font-extrabold border transition-all ${
+                  isDeliveryAvailable 
+                    ? 'bg-green-100 border-green-500 text-green-900' 
+                    : 'bg-red-50 border-red-300 text-red-700'
+                }`}
+              >
+                🛵 Delivery: {isDeliveryAvailable ? 'Disponible' : 'No disponible'}
               </button>
             </div>
 
