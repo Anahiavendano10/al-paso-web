@@ -59,15 +59,15 @@ export default function App() {
     await supabase.from('products').delete().eq('category', 'Empanadas');
 
     const empanadasList = [
-      { name: 'Empanada de Pollo', description: 'Pollo deshesado condimentado con vegetales', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada de Carne', description: 'Carne jugosa cortada a cuchillo con especias', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada de Queso', description: 'Queso derretido artesanal', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada Caprese', description: 'Queso, tomate fresco y albahaca', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada Pollo y Jamón', description: 'Pollo tierno con trozos de jamón cocido', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada de Osobuco', description: 'Osobuco braseado lentamente', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada Árabe', description: 'Carne marinada con limón y especias orientales', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada Pollo al Champiñón', description: 'Pollo en salsa de champiñones a la crema', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
-      { name: 'Empanada de Matambre', description: 'Matambre tierno tiernizado y condimentado', price: 1500, category: 'Empanadas', available: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' }
+      { name: 'Empanada de Pollo', description: 'Pollo deshesado condimentado con vegetales', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Carne', description: 'Carne jugosa cortada a cuchillo con especias', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Queso', description: 'Queso derretido artesanal', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Caprese', description: 'Queso, tomate fresco y albahaca', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Pollo y Jamón', description: 'Pollo tierno con trozos de jamón cocido', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Osobuco', description: 'Osobuco braseado lentamente', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Árabe', description: 'Carne marinada con limón y especias orientales', price: 1500, category: 'Empanadas', available: true, is_featured: false, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada Pollo al Champiñón', description: 'Pollo en salsa de champiñones a la crema', price: 1500, category: 'Empanadas', available: true, is_featured: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' },
+      { name: 'Empanada de Matambre', description: 'Matambre tierno tiernizado y condimentado', price: 1500, category: 'Empanadas', available: true, is_featured: true, image: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=400&auto=format&fit=crop' }
     ];
 
     await supabase.from('products').insert(empanadasList);
@@ -121,7 +121,9 @@ export default function App() {
   });
 
   const isSpecialEmpanada = (item) => {
-    if (!item || item.category !== 'Empanadas') return false;
+    if (!item) return false;
+    if (item.is_featured) return true;
+    if (item.category !== 'Empanadas') return false;
     const nameLower = item.name.toLowerCase();
     return nameLower.includes('champi') || nameLower.includes('matambre');
   };
@@ -176,10 +178,19 @@ export default function App() {
 
   const totalCartPrice = cart.reduce((acc, item) => acc + item.totalPrice, 0);
 
+  // ALTERNAR AGOTADO / DISPONIBLE
   const toggleAvailable = async (id, currentStatus) => {
     const { error } = await supabase.from('products').update({ available: !currentStatus }).eq('id', id);
     if (!error) {
       setProducts(products.map(p => p.id === id ? { ...p, available: !p.available } : p));
+    }
+  };
+
+  // ALTERNAR DESTACADO
+  const toggleFeatured = async (id, currentFeatured) => {
+    const { error } = await supabase.from('products').update({ is_featured: !currentFeatured }).eq('id', id);
+    if (!error) {
+      setProducts(products.map(p => p.id === id ? { ...p, is_featured: !p.is_featured } : p));
     }
   };
 
@@ -255,7 +266,7 @@ export default function App() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
 
-        {/* TARJETA NEGRA CON IMAGEN DE FONDO (ALARGADA AL ANCHO COMPLETO DEL BUSCADOR) */}
+        {/* TARJETA NEGRA CON IMAGEN DE FONDO */}
         <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md w-full">
           <div className="h-44 relative overflow-hidden">
             <img
@@ -478,12 +489,25 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* BOTONES SOLO EN MODO ADMINISTRADOR: AGOTADO Y DESTACADO */}
                   {isAdmin && (
-                    <div className="px-4 pb-3 border-t border-gray-100 pt-2 flex justify-end" onClick={(e) => e.stopPropagation()}>
+                    <div className="px-4 pb-3 border-t border-gray-100 pt-2 flex justify-between items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => toggleFeatured(item.id, item.is_featured)}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1 transition-all ${
+                          item.is_featured 
+                            ? 'bg-amber-400 text-black shadow-xs' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        <Star size={11} className={item.is_featured ? 'fill-black' : ''} />
+                        {item.is_featured ? 'Destacado' : 'Destacar'}
+                      </button>
+
                       <button
                         onClick={() => toggleAvailable(item.id, item.available)}
-                        className={`px-3 py-1 rounded-xl text-[10px] font-black transition-all ${
-                          item.available ? 'bg-red-600 text-white' : 'bg-black text-white'
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all ${
+                          item.available ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-black text-white'
                         }`}
                       >
                         {item.available ? 'Agotar' : 'Activar'}
