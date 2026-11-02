@@ -198,14 +198,14 @@ export default function App() {
   };
 
   return (
-    <div style={{ backgroundColor: '#95c623' }} className="min-h-screen text-gray-900 font-sans pb-24">
+    <div style={{ backgroundColor: '#E8Edd6' }} className="min-h-screen text-gray-900 font-sans pb-24">
 
       {/* HEADER SUPERIOR */}
       <header className="bg-white px-5 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
         <div className="max-w-md md:max-w-3xl w-full mx-auto flex justify-between items-center">
           <button
             onClick={() => setIsInfoModalOpen(true)}
-            className="p-1 text-gray-800 hover:bg-[#E8Edd6] rounded-lg transition-all"
+            className="p-1 text-gray-800 hover:bg-[#95c623] rounded-lg transition-all"
           >
             <Menu size={22} />
           </button>
@@ -227,7 +227,7 @@ export default function App() {
             ) : (
               <button
                 onClick={() => setIsPinModalOpen(true)}
-                className="p-1.5 text-gray-700 hover:bg-[#E8Edd6] rounded-full"
+                className="p-1.5 text-gray-700 hover:bg-[#95c623] rounded-full"
                 title="Acceso Administración"
               >
                 <Settings size={20} />
@@ -236,7 +236,7 @@ export default function App() {
 
             <button
               onClick={() => setIsCartOpen(true)}
-              className="p-1.5 text-gray-800 hover:bg-[#E8Edd6] rounded-full relative"
+              className="p-1.5 text-gray-800 hover:bg-[#95c623] rounded-full relative"
             >
               <ShoppingBag size={22} />
               {cart.length > 0 && (
@@ -274,7 +274,7 @@ export default function App() {
 
                 <button
                   onClick={() => setIsInfoModalOpen(true)}
-                  className="text-black p-1 hover:bg-[#E8Edd6] rounded-full transition-all"
+                  className="text-black p-1 hover:bg-[#95c623] rounded-full transition-all"
                 >
                   <Info size={24} />
                 </button>
@@ -294,10 +294,10 @@ export default function App() {
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span style={{ backgroundColor: '#E8Edd6' }} className="text-black px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                  <span style={{ backgroundColor: '#95c623' }} className="text-black px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
                     🛵 Delivery
                   </span>
-                  <span style={{ backgroundColor: '#E8Edd6' }} className="text-black px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                  <span style={{ backgroundColor: '#95c623' }} className="text-black px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
                     🛍️ Retiro
                   </span>
                 </div>
@@ -359,7 +359,7 @@ export default function App() {
                 className={`w-full py-2.5 px-2 rounded-xl text-[11px] font-extrabold text-center transition-all ${
                   selectedCategory === cat
                     ? 'bg-black text-white shadow-md'
-                    : 'bg-[#E8Edd6] text-black border border-black/10 hover:bg-white'
+                    : 'bg-[#95c623] text-black border border-black/10 hover:bg-white'
                 }`}
               >
                 {cat}
@@ -391,7 +391,7 @@ export default function App() {
                 <div
                   key={item.id}
                   onClick={() => openProductDetail(item)}
-                  style={{ backgroundColor: '#E8Edd6' }}
+                  style={{ backgroundColor: '#95c623' }}
                   className={`rounded-2xl p-3 shadow-sm border flex items-center justify-between gap-3 relative overflow-hidden ${
                     especial ? 'border-2 border-black' : 'border-black/10'
                   } ${
@@ -416,7 +416,7 @@ export default function App() {
                       )}
                     </div>
 
-                    <p className="text-[11px] text-gray-700 line-clamp-2 mt-0.5">{item.description || item.category}</p>
+                    <p className="text-[11px] text-gray-800 line-clamp-2 mt-0.5 font-medium">{item.description || item.category}</p>
                     
                     {/* PRECIOS EN LA TARJETA */}
                     <div className="flex items-center gap-2 mt-2">
@@ -425,7 +425,7 @@ export default function App() {
                           <span className="font-black text-sm text-black">
                             ${especial ? '16.000' : '14.000'} doc.
                           </span>
-                          <span className="text-[10px] font-bold text-gray-600">
+                          <span className="text-[10px] font-bold text-gray-700">
                             ($1.500 u.)
                           </span>
                         </>
@@ -491,7 +491,7 @@ export default function App() {
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
             <button
               onClick={() => setIsInfoModalOpen(false)}
-              className="absolute top-4 right-4 bg-[#E8Edd6] p-1.5 rounded-full text-black hover:bg-gray-200"
+              className="absolute top-4 right-4 bg-[#95c623] p-1.5 rounded-full text-black hover:bg-gray-200"
             >
               <X size={18} />
             </button>
@@ -514,7 +514,7 @@ export default function App() {
 
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Horarios de Atención</h3>
-                <div style={{ backgroundColor: '#E8Edd6' }} className="p-3 rounded-2xl space-y-2 text-black font-medium text-[11px]">
+                <div style={{ backgroundColor: '#95c623' }} className="p-3 rounded-2xl space-y-2 text-black font-medium text-[11px]">
                   <div className="flex justify-between items-center border-b border-black/10 pb-1.5">
                     <span>Lunes a Sábado</span> 
                     <span className="font-bold text-black text-right">
@@ -531,10 +531,10 @@ export default function App() {
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
                 <div className="flex gap-3">
-                  <a href={INSTAGRAM_LINK} target="_blank" rel="noreferrer" style={{ backgroundColor: '#E8Edd6' }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-black hover:opacity-80">
+                  <a href={INSTAGRAM_LINK} target="_blank" rel="noreferrer" style={{ backgroundColor: '#95c623' }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-black hover:opacity-80">
                     <Instagram size={14} /> Instagram
                   </a>
-                  <a href={FACEBOOK_LINK} target="_blank" rel="noreferrer" style={{ backgroundColor: '#E8Edd6' }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-black hover:opacity-80">
+                  <a href={FACEBOOK_LINK} target="_blank" rel="noreferrer" style={{ backgroundColor: '#95c623' }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-black hover:opacity-80">
                     <Facebook size={14} /> Facebook
                   </a>
                 </div>
@@ -542,7 +542,7 @@ export default function App() {
 
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
-                <div style={{ backgroundColor: '#E8Edd6' }} className="p-3.5 rounded-2xl space-y-3">
+                <div style={{ backgroundColor: '#95c623' }} className="p-3.5 rounded-2xl space-y-3">
                   <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
                     <iframe
                       title="Mapa AL PASO"
@@ -582,7 +582,7 @@ export default function App() {
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 bg-[#E8Edd6] p-1.5 rounded-full hover:bg-gray-200 transition-all z-10 text-black"
+              className="absolute top-4 right-4 bg-[#95c623] p-1.5 rounded-full hover:bg-gray-200 transition-all z-10 text-black"
             >
               <X size={18} />
             </button>
@@ -633,7 +633,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProductQuantity(productQuantity + 1)}
-                      style={{ backgroundColor: '#E8Edd6' }}
+                      style={{ backgroundColor: '#95c623' }}
                       className="w-full py-2 px-1 hover:bg-black hover:text-white border border-black/10 rounded-xl text-xs font-bold text-black transition-all active:scale-95 mb-1"
                     >
                       +1 Unidad
@@ -646,7 +646,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProductQuantity(productQuantity + 6)}
-                      style={{ backgroundColor: '#E8Edd6' }}
+                      style={{ backgroundColor: '#95c623' }}
                       className="w-full py-2 px-1 hover:bg-black hover:text-white border border-black/10 rounded-xl text-xs font-bold text-black transition-all active:scale-95 mb-1"
                     >
                       +1/2 Docena
@@ -661,7 +661,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProductQuantity(productQuantity + 12)}
-                      style={{ backgroundColor: '#E8Edd6' }}
+                      style={{ backgroundColor: '#95c623' }}
                       className="w-full py-2 px-1 hover:bg-black hover:text-white border border-black/10 rounded-xl text-xs font-bold text-black transition-all active:scale-95 mb-1"
                     >
                       +1 Docena
@@ -686,15 +686,15 @@ export default function App() {
                   placeholder="Ej: Con mayo, sin cebolla, agregar tomate extra..."
                   value={productNotes}
                   onChange={(e) => setProductNotes(e.target.value)}
-                  style={{ backgroundColor: '#E8Edd6' }}
-                  className="w-full p-2.5 border border-black/10 rounded-xl text-xs font-medium focus:border-black outline-none resize-none text-black placeholder:text-gray-600"
+                  style={{ backgroundColor: '#95c623' }}
+                  className="w-full p-2.5 border border-black/10 rounded-xl text-xs font-medium focus:border-black outline-none resize-none text-black placeholder:text-gray-800"
                 />
               </div>
             )}
 
             {/* Parte inferior: Selector de cantidad y Botón de añadir */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-              <div style={{ backgroundColor: '#E8Edd6' }} className="flex items-center gap-3 px-3 py-1.5 rounded-xl border border-black/10">
+              <div style={{ backgroundColor: '#95c623' }} className="flex items-center gap-3 px-3 py-1.5 rounded-xl border border-black/10">
                 <button 
                   type="button" 
                   onClick={() => setProductQuantity(Math.max(0, productQuantity - 1))}
@@ -786,7 +786,7 @@ export default function App() {
               <X size={18} />
             </button>
 
-            <div style={{ backgroundColor: '#E8Edd6' }} className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 text-black">
+            <div style={{ backgroundColor: '#95c623' }} className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 text-black">
               <Lock size={20} />
             </div>
 
