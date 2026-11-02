@@ -199,7 +199,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f5f7] text-[#1e1e1e] font-sans pb-24">
+    <div className="min-h-screen bg-[hsl(#95c623)] text-[#1e1e1e] font-sans pb-24">
 
       {/* HEADER SUPERIOR */}
       <header className="bg-white px-5 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
