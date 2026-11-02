@@ -108,21 +108,26 @@ export default function App() {
   };
 
   // Cálculo: $1.500 cada unidad, aplica promo si alcanza 12 u. ($14.000 normales / $16.000 especiales)
+// Cálculo de promociones: 12 u. ($14.000 / $16.000), 6 u. ($7.000 / $8.000) y sueltas ($1.500)
+// Cálculo de promociones: 12 u. ($14.000 / $16.000), 6 u. ($7.000 / $8.000) y sueltas ($1.500)
   const calculateTotalPrice = (prod, qty) => {
     if (!prod) return 0;
     if (prod.category === 'Empanadas') {
       const isEspecial = isSpecialEmpanada(prod);
       const docenas = Math.floor(qty / 12);
-      const unidadesRestantes = qty % 12;
+      const restoDocena = qty % 12;
+      const medias = Math.floor(restoDocena / 6);
+      const unidadesSueltas = restoDocena % 6;
 
       const precioDocena = isEspecial ? 16000 : 14000;
+      const precioMedia = isEspecial ? 8000 : 7000;
       const precioUnidad = 1500;
 
-      return (docenas * precioDocena) + (unidadesRestantes * precioUnidad);
+      return (docenas * precioDocena) + (medias * precioMedia) + (unidadesSueltas * precioUnidad);
     }
     return Math.round(prod.price * qty);
   };
-
+  
   const addToCart = () => {
     if (!selectedProduct || productQuantity <= 0) return;
 
