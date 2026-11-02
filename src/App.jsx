@@ -240,7 +240,6 @@ export default function App() {
               </button>
             )}
 
-            {/* NUEVO ÍCONO DE CARRITO DE SUPERMERCADO */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
@@ -256,8 +255,8 @@ export default function App() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
 
-        {/* TARJETA CON IMAGEN DE FONDO DETRÁS */}
-        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md max-w-md mx-auto">
+        {/* TARJETA NEGRA CON IMAGEN DE FONDO (ALARGADA AL ANCHO COMPLETO DEL BUSCADOR) */}
+        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md w-full">
           <div className="h-44 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
@@ -286,10 +285,8 @@ export default function App() {
                 <span>{DIRECCION_REAL}</span>
               </div>
 
-              {/* BOTONES INFERIORES: RETIRO EN VERDE Y DELIVERY SEGUNDO */}
+              {/* BOTONES INFERIORES: RETIRO Y DELIVERY */}
               <div className="grid grid-cols-2 gap-3 pt-2">
-                
-                {/* 1° RETIRO EN VERDE LIMA */}
                 <button
                   style={{ backgroundColor: isRetiroAvailable ? '#95c623' : '#1e1e1e' }}
                   className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 transition-all ${
@@ -301,7 +298,6 @@ export default function App() {
                   🛍️ Retiro {!isRetiroAvailable && <span className="text-[10px] font-normal">(No disponible)</span>}
                 </button>
 
-                {/* 2° DELIVERY */}
                 <button
                   style={{ backgroundColor: isDeliveryAvailable ? '#95c623' : '#1e1e1e' }}
                   className={`py-2.5 px-4 rounded-2xl font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm transition-all ${
