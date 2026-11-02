@@ -87,7 +87,6 @@ export default function App() {
     setIsAdmin(false);
   };
 
-  // 🔴 LISTA DE CATEGORÍAS CON EMOJIS (Menos Todos)
   const categories = [
     'Todos', 
     'Promos 🏷️', 
@@ -199,21 +198,21 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[hsl(#95c623)] text-[#1e1e1e] font-sans pb-24">
+    <div style={{ backgroundColor: '#95c623' }} className="min-h-screen text-gray-900 font-sans pb-24">
 
       {/* HEADER SUPERIOR */}
       <header className="bg-white px-5 py-3.5 flex justify-between items-center shadow-xs sticky top-0 z-30 border-b border-gray-100">
         <div className="max-w-md md:max-w-3xl w-full mx-auto flex justify-between items-center">
           <button
             onClick={() => setIsInfoModalOpen(true)}
-            className="p-1 text-gray-800 hover:bg-gray-100 rounded-lg transition-all"
+            className="p-1 text-gray-800 hover:bg-[#E8Edd6] rounded-lg transition-all"
           >
             <Menu size={22} />
           </button>
 
           <div className="flex items-center gap-1.5 cursor-pointer" onClick={() => setIsInfoModalOpen(true)}>
             <h1 className="text-xl font-black tracking-wider text-black">AL PASO</h1>
-            <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
+            <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-black' : 'bg-red-500'}`} />
           </div>
 
           <div className="flex items-center gap-2">
@@ -228,7 +227,7 @@ export default function App() {
             ) : (
               <button
                 onClick={() => setIsPinModalOpen(true)}
-                className="p-1.5 text-gray-700 hover:bg-gray-100 rounded-full"
+                className="p-1.5 text-gray-700 hover:bg-[#E8Edd6] rounded-full"
                 title="Acceso Administración"
               >
                 <Settings size={20} />
@@ -237,7 +236,7 @@ export default function App() {
 
             <button
               onClick={() => setIsCartOpen(true)}
-              className="p-1.5 text-gray-800 hover:bg-gray-100 rounded-full relative"
+              className="p-1.5 text-gray-800 hover:bg-[#E8Edd6] rounded-full relative"
             >
               <ShoppingBag size={22} />
               {cart.length > 0 && (
@@ -254,7 +253,7 @@ export default function App() {
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-4 space-y-4">
 
         {/* PORTADA Y TARJETA FLOTANTE */}
-        <div className="relative rounded-[2rem] overflow-hidden bg-[#0d141e] shadow-md border border-gray-200/60 max-w-md mx-auto">
+        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md border border-gray-200/60 max-w-md mx-auto">
           <div className="h-56 relative overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
@@ -268,37 +267,37 @@ export default function App() {
               <div className="flex justify-between items-start">
                 <div>
                   <h2 className="text-2xl font-black text-black tracking-tight">AL PASO</h2>
-                  <p className="text-[11px] font-extrabold text-slate-400 tracking-wider uppercase mt-0.5">
+                  <p className="text-[11px] font-extrabold text-gray-400 tracking-wider uppercase mt-0.5">
                     EMPANADERÍA Y SÁNDWICHERÍA
                   </p>
                 </div>
 
                 <button
                   onClick={() => setIsInfoModalOpen(true)}
-                  className="text-[#95c623] p-1 hover:bg-lime-50 rounded-full transition-all"
+                  className="text-black p-1 hover:bg-[#E8Edd6] rounded-full transition-all"
                 >
                   <Info size={24} />
                 </button>
               </div>
 
-              <div className="flex items-center gap-1.5 text-xs text-slate-500 font-semibold pt-0.5">
-                <MapPin size={16} className="text-[#95c623] shrink-0" />
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 font-semibold pt-0.5">
+                <MapPin size={16} className="text-black shrink-0" />
                 <span>{DIRECCION_REAL}</span>
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <div className="flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
+                  <span className={`w-2.5 h-2.5 rounded-full ${isOpenLocal ? 'bg-black' : 'bg-red-500'}`} />
                   <span className="font-extrabold text-xs text-black">
                     {isOpenLocal ? 'Abierto' : 'Cerrado'}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-1.5">
-                  <span className="bg-[#f2f4f8] text-slate-700 px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                  <span style={{ backgroundColor: '#E8Edd6' }} className="text-black px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
                     🛵 Delivery
                   </span>
-                  <span className="bg-[#f2f4f8] text-slate-700 px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
+                  <span style={{ backgroundColor: '#E8Edd6' }} className="text-black px-3 py-1.5 rounded-xl text-[10px] font-extrabold flex items-center gap-1">
                     🛍️ Retiro
                   </span>
                 </div>
@@ -309,19 +308,19 @@ export default function App() {
 
         {/* MODO ADMINISTRADOR */}
         {isAdmin && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 space-y-2 shadow-sm max-w-md mx-auto">
+          <div className="bg-white border-2 border-black rounded-2xl p-3.5 space-y-2 shadow-sm max-w-md mx-auto">
             <div className="flex justify-between items-center">
               <div>
-                <span className="font-extrabold text-xs text-amber-900 flex items-center gap-1">
+                <span className="font-extrabold text-xs text-black flex items-center gap-1">
                   <Settings size={14} /> Modo Administrador
                 </span>
-                <p className="text-[10px] text-amber-700">Cambia horario o marca productos agotados</p>
+                <p className="text-[10px] text-gray-600">Cambia horario o marca productos agotados</p>
               </div>
 
               <button
                 onClick={() => setIsOpenLocal(!isOpenLocal)}
                 className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 transition-all ${
-                  isOpenLocal ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                  isOpenLocal ? 'bg-black text-white' : 'bg-red-600 text-white'
                 }`}
               >
                 <Power size={12} />
@@ -331,7 +330,7 @@ export default function App() {
 
             <button
               onClick={seedEmpanadasInSupabase}
-              className="w-full bg-amber-600 hover:bg-amber-700 text-white py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition-all"
+              className="w-full bg-black text-white py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition-all hover:opacity-90"
             >
               <RefreshCw size={12} /> Cargar / Restablecer Sabores de Empanadas
             </button>
@@ -347,11 +346,11 @@ export default function App() {
               placeholder="Buscar tu plato favorito..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-xs font-semibold outline-none"
+              className="w-full bg-transparent text-xs font-semibold outline-none text-black"
             />
           </div>
 
-          {/* 🔴 CATEGORÍAS EN GRID FIJO (3 por fila, 2 filas exactas) */}
+          {/* GRID DE CATEGORÍAS (FIJAS EN 2 FILAS) */}
           <div className="grid grid-cols-3 gap-2 py-1">
             {categories.map((cat) => (
               <button
@@ -359,8 +358,8 @@ export default function App() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`w-full py-2.5 px-2 rounded-xl text-[11px] font-extrabold text-center transition-all ${
                   selectedCategory === cat
-                    ? 'bg-black text-white shadow-sm'
-                    : 'bg-white text-gray-700 border border-gray-100'
+                    ? 'bg-black text-white shadow-md'
+                    : 'bg-[#E8Edd6] text-black border border-black/10 hover:bg-white'
                 }`}
               >
                 {cat}
@@ -372,10 +371,10 @@ export default function App() {
         {/* LISTA DE PRODUCTOS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
           {loading ? (
-            <p className="col-span-full text-center text-xs text-gray-400 py-8">Cargando menú...</p>
+            <p className="col-span-full text-center text-xs text-black font-bold py-8">Cargando menú...</p>
           ) : filteredProducts.length === 0 ? (
             <div className="col-span-full text-center py-8 space-y-3">
-              <p className="text-xs text-gray-400">No hay productos disponibles en esta sección</p>
+              <p className="text-xs text-black font-bold">No hay productos disponibles en esta sección</p>
               {selectedCategory.includes('Empanadas') && (
                 <button
                   onClick={seedEmpanadasInSupabase}
@@ -392,45 +391,46 @@ export default function App() {
                 <div
                   key={item.id}
                   onClick={() => openProductDetail(item)}
-                  className={`bg-white rounded-2xl p-3 shadow-sm border flex items-center justify-between gap-3 relative overflow-hidden ${
-                    especial ? 'border-amber-200 bg-gradient-to-r from-amber-50/30 to-white' : 'border-gray-100'
+                  style={{ backgroundColor: '#E8Edd6' }}
+                  className={`rounded-2xl p-3 shadow-sm border flex items-center justify-between gap-3 relative overflow-hidden ${
+                    especial ? 'border-2 border-black' : 'border-black/10'
                   } ${
-                    item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60 bg-gray-50'
+                    item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'
                   }`}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
+                      <h3 className="font-extrabold text-sm text-black truncate">{item.name}</h3>
 
                       {/* BADGE ESPECIAL ⭐ */}
                       {especial && (
-                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs animate-pulse">
-                          <Star size={9} className="fill-amber-950" /> ESPECIAL
+                        <span className="bg-black text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                          <Star size={9} className="fill-white" /> ESPECIAL
                         </span>
                       )}
 
                       {!item.available && (
-                        <span className="bg-red-100 text-red-700 text-[9px] font-black px-1.5 py-0.5 rounded">
+                        <span className="bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded">
                           AGOTADO
                         </span>
                       )}
                     </div>
 
-                    <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
+                    <p className="text-[11px] text-gray-700 line-clamp-2 mt-0.5">{item.description || item.category}</p>
                     
                     {/* PRECIOS EN LA TARJETA */}
                     <div className="flex items-center gap-2 mt-2">
                       {item.category === 'Empanadas' ? (
                         <>
-                          <span className="font-black text-sm text-gray-900">
+                          <span className="font-black text-sm text-black">
                             ${especial ? '16.000' : '14.000'} doc.
                           </span>
-                          <span className="text-[10px] font-bold text-gray-400">
+                          <span className="text-[10px] font-bold text-gray-600">
                             ($1.500 u.)
                           </span>
                         </>
                       ) : (
-                        <span className="font-black text-sm text-gray-900">
+                        <span className="font-black text-sm text-black">
                           ${Math.round(item.price)}
                         </span>
                       )}
@@ -446,13 +446,13 @@ export default function App() {
                   </div>
 
                   {isAdmin && (
-                    <div className="pl-2 border-l border-gray-100" onClick={(e) => e.stopPropagation()}>
+                    <div className="pl-2 border-l border-black/10" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => toggleAvailable(item.id, item.available)}
                         className={`px-2.5 py-1 rounded-xl text-[10px] font-black transition-all ${
                           item.available 
-                            ? 'bg-red-100 text-red-700 hover:bg-red-200' 
-                            : 'bg-green-100 text-green-700 hover:bg-green-200'
+                            ? 'bg-red-600 text-white' 
+                            : 'bg-black text-white'
                         }`}
                       >
                         {item.available ? 'Agotar' : 'Activar'}
@@ -472,10 +472,10 @@ export default function App() {
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
             onClick={() => setIsCartOpen(true)}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 px-5 rounded-2xl font-black text-xs flex justify-between items-center shadow-xl active:scale-98 transition-all"
+            className="w-full bg-black text-white py-3.5 px-5 rounded-2xl font-black text-xs flex justify-between items-center shadow-2xl active:scale-98 transition-all hover:bg-gray-900"
           >
             <div className="flex items-center gap-2">
-              <span className="bg-white/20 w-6 h-6 rounded-full flex items-center justify-center text-[11px]">
+              <span style={{ backgroundColor: '#95c623' }} className="text-black w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-black">
                 {cart.length}
               </span>
               <span>Ver mi pedido</span>
@@ -491,7 +491,7 @@ export default function App() {
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
             <button
               onClick={() => setIsInfoModalOpen(false)}
-              className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200"
+              className="absolute top-4 right-4 bg-[#E8Edd6] p-1.5 rounded-full text-black hover:bg-gray-200"
             >
               <X size={18} />
             </button>
@@ -514,16 +514,16 @@ export default function App() {
 
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Horarios de Atención</h3>
-                <div className="bg-gray-50 p-3 rounded-2xl space-y-2 text-gray-600 font-medium text-[11px]">
-                  <div className="flex justify-between items-center border-b border-gray-200/60 pb-1.5">
+                <div style={{ backgroundColor: '#E8Edd6' }} className="p-3 rounded-2xl space-y-2 text-black font-medium text-[11px]">
+                  <div className="flex justify-between items-center border-b border-black/10 pb-1.5">
                     <span>Lunes a Sábado</span> 
-                    <span className="font-bold text-gray-900 text-right">
+                    <span className="font-bold text-black text-right">
                       10:00 - 16:00<br />19:00 - 00:30
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-0.5">
                     <span>Domingos</span> 
-                    <span className="font-bold text-gray-900">10:00 - 16:00</span>
+                    <span className="font-bold text-black">10:00 - 16:00</span>
                   </div>
                 </div>
               </div>
@@ -531,10 +531,10 @@ export default function App() {
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Síguenos</h3>
                 <div className="flex gap-3">
-                  <a href={INSTAGRAM_LINK} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
+                  <a href={INSTAGRAM_LINK} target="_blank" rel="noreferrer" style={{ backgroundColor: '#E8Edd6' }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-black hover:opacity-80">
                     <Instagram size={14} /> Instagram
                   </a>
-                  <a href={FACEBOOK_LINK} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 bg-gray-100 px-3 py-2 rounded-xl font-bold text-gray-700 hover:bg-gray-200">
+                  <a href={FACEBOOK_LINK} target="_blank" rel="noreferrer" style={{ backgroundColor: '#E8Edd6' }} className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-black hover:opacity-80">
                     <Facebook size={14} /> Facebook
                   </a>
                 </div>
@@ -542,7 +542,7 @@ export default function App() {
 
               <div>
                 <h3 className="font-extrabold text-gray-800 uppercase tracking-wider text-[10px] mb-2">Ubicación</h3>
-                <div className="bg-gray-50 p-3.5 rounded-2xl space-y-3">
+                <div style={{ backgroundColor: '#E8Edd6' }} className="p-3.5 rounded-2xl space-y-3">
                   <div className="w-full h-36 bg-gray-200 rounded-xl overflow-hidden shadow-inner relative">
                     <iframe
                       title="Mapa AL PASO"
@@ -556,8 +556,8 @@ export default function App() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <MapPin size={16} className="text-[#95c623] shrink-0" />
-                    <span className="text-xs font-bold text-gray-800">{DIRECCION_REAL}</span>
+                    <MapPin size={16} className="text-black shrink-0" />
+                    <span className="text-xs font-bold text-black">{DIRECCION_REAL}</span>
                   </div>
 
                   <a
@@ -582,7 +582,7 @@ export default function App() {
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative animate-in slide-in-from-bottom">
             <button
               onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full hover:bg-gray-200 transition-all z-10"
+              className="absolute top-4 right-4 bg-[#E8Edd6] p-1.5 rounded-full hover:bg-gray-200 transition-all z-10 text-black"
             >
               <X size={18} />
             </button>
@@ -600,10 +600,10 @@ export default function App() {
             <div className="flex justify-between items-start gap-2 flex-wrap mb-1">
               <div className="flex-1 min-w-[200px]">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-lg font-black">{selectedProduct.name}</h3>
+                  <h3 className="text-lg font-black text-black">{selectedProduct.name}</h3>
                   {isSpecialEmpanada(selectedProduct) && (
-                    <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
-                      <Star size={9} className="fill-amber-950" /> ESPECIAL
+                    <span className="bg-black text-white text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                      <Star size={9} className="fill-white" /> ESPECIAL
                     </span>
                   )}
                 </div>
@@ -615,7 +615,7 @@ export default function App() {
               {/* Precio de la docena en el modal */}
               {selectedProduct.category === 'Empanadas' && (
                 <div className="text-right shrink-0 pt-0.5">
-                  <span className="text-lg font-black text-gray-900 block">
+                  <span className="text-lg font-black text-black block">
                     ${isSpecialEmpanada(selectedProduct) ? '16000' : '14000'} doc.
                   </span>
                 </div>
@@ -625,7 +625,7 @@ export default function App() {
             {/* Selección de cantidad rápida (Empanadas) */}
             {selectedProduct.category === 'Empanadas' && (
               <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
-                <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
+                <p className="text-xs font-bold text-black mb-2">Sumar cantidad rápida:</p>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   
                   {/* +1 Unidad */}
@@ -633,11 +633,12 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProductQuantity(productQuantity + 1)}
-                      className="w-full py-2 px-1 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95 mb-1"
+                      style={{ backgroundColor: '#E8Edd6' }}
+                      className="w-full py-2 px-1 hover:bg-black hover:text-white border border-black/10 rounded-xl text-xs font-bold text-black transition-all active:scale-95 mb-1"
                     >
                       +1 Unidad
                     </button>
-                    <span className="text-sm font-black text-gray-900">$1500</span>
+                    <span className="text-sm font-black text-black">$1500</span>
                   </div>
 
                   {/* +1/2 Docena */}
@@ -645,11 +646,12 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProductQuantity(productQuantity + 6)}
-                      className="w-full py-2 px-1 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95 mb-1"
+                      style={{ backgroundColor: '#E8Edd6' }}
+                      className="w-full py-2 px-1 hover:bg-black hover:text-white border border-black/10 rounded-xl text-xs font-bold text-black transition-all active:scale-95 mb-1"
                     >
                       +1/2 Docena
                     </button>
-                    <span className="text-sm font-black text-gray-900">
+                    <span className="text-sm font-black text-black">
                       ${isSpecialEmpanada(selectedProduct) ? '8000' : '7000'}
                     </span>
                   </div>
@@ -659,11 +661,12 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setProductQuantity(productQuantity + 12)}
-                      className="w-full py-2 px-1 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95 mb-1"
+                      style={{ backgroundColor: '#E8Edd6' }}
+                      className="w-full py-2 px-1 hover:bg-black hover:text-white border border-black/10 rounded-xl text-xs font-bold text-black transition-all active:scale-95 mb-1"
                     >
                       +1 Docena
                     </button>
-                    <span className="text-sm font-black text-gray-900">
+                    <span className="text-sm font-black text-black">
                       ${isSpecialEmpanada(selectedProduct) ? '16000' : '14000'}
                     </span>
                   </div>
@@ -675,7 +678,7 @@ export default function App() {
             {/* Sándwiches y Hamburguesas - Agregar Notas */}
             {(selectedProduct.category === 'Sandwiches' || selectedProduct.category === 'Hamburguesas') && (
               <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
-                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                <label className="block text-xs font-bold text-black mb-1.5">
                   Aderezos y verduras adicionales:
                 </label>
                 <textarea
@@ -683,26 +686,27 @@ export default function App() {
                   placeholder="Ej: Con mayo, sin cebolla, agregar tomate extra..."
                   value={productNotes}
                   onChange={(e) => setProductNotes(e.target.value)}
-                  className="w-full p-2.5 border border-gray-200 rounded-xl text-xs font-medium focus:border-black outline-none resize-none bg-gray-50"
+                  style={{ backgroundColor: '#E8Edd6' }}
+                  className="w-full p-2.5 border border-black/10 rounded-xl text-xs font-medium focus:border-black outline-none resize-none text-black placeholder:text-gray-600"
                 />
               </div>
             )}
 
             {/* Parte inferior: Selector de cantidad y Botón de añadir */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-              <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl">
+              <div style={{ backgroundColor: '#E8Edd6' }} className="flex items-center gap-3 px-3 py-1.5 rounded-xl border border-black/10">
                 <button 
                   type="button" 
                   onClick={() => setProductQuantity(Math.max(0, productQuantity - 1))}
-                  className="p-1 font-bold text-gray-700 hover:text-black"
+                  className="p-1 font-bold text-black hover:opacity-70"
                 >
                   <Minus size={14} />
                 </button>
-                <span className="font-extrabold text-sm min-w-[20px] text-center">{productQuantity}</span>
+                <span className="font-extrabold text-sm min-w-[20px] text-center text-black">{productQuantity}</span>
                 <button 
                   type="button" 
                   onClick={() => setProductQuantity(productQuantity + 1)}
-                  className="p-1 font-bold text-gray-700 hover:text-black"
+                  className="p-1 font-bold text-black hover:opacity-70"
                 >
                   <Plus size={14} />
                 </button>
@@ -731,7 +735,7 @@ export default function App() {
         <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
             <div className="flex justify-between items-center pb-3 border-b">
-              <h3 className="font-black text-base">Tu Pedido</h3>
+              <h3 className="font-black text-base text-black">Tu Pedido</h3>
               <button onClick={() => setIsCartOpen(false)} className="p-1 text-gray-400">
                 <X size={20} />
               </button>
@@ -744,9 +748,9 @@ export default function App() {
                 {cart.map((item) => (
                   <div key={item.cartId} className="py-3 flex justify-between items-center">
                     <div>
-                      <p className="font-extrabold text-xs">{item.name} (x{item.quantity})</p>
-                      {item.notes && <p className="text-[10px] text-gray-500 italic">Notas: {item.notes}</p>}
-                      <p className="text-[10px] text-gray-400">${item.totalPrice}</p>
+                      <p className="font-extrabold text-xs text-black">{item.name} (x{item.quantity})</p>
+                      {item.notes && <p className="text-[10px] text-gray-600 italic">Notas: {item.notes}</p>}
+                      <p className="text-[10px] text-gray-500 font-bold">${item.totalPrice}</p>
                     </div>
                     <button onClick={() => removeFromCart(item.cartId)} className="text-red-500 p-1">
                       <X size={16} />
@@ -756,14 +760,14 @@ export default function App() {
               </div>
             )}
 
-            <div className="pt-3 border-t flex justify-between items-center font-black text-sm mb-4">
+            <div className="pt-3 border-t flex justify-between items-center font-black text-sm mb-4 text-black">
               <span>Total</span>
               <span>${totalCartPrice}</span>
             </div>
 
             <button
               onClick={handleSendWhatsApp}
-              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-2xl font-black text-xs transition-all active:scale-95"
+              className="w-full bg-black hover:bg-gray-800 text-white py-3 rounded-2xl font-black text-xs transition-all active:scale-95 shadow-md"
             >
               Continuar con el pedido en WhatsApp
             </button>
@@ -782,11 +786,11 @@ export default function App() {
               <X size={18} />
             </button>
 
-            <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2 text-gray-800">
+            <div style={{ backgroundColor: '#E8Edd6' }} className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-2 text-black">
               <Lock size={20} />
             </div>
 
-            <h3 className="font-black text-sm text-gray-900">Acceso Administrador</h3>
+            <h3 className="font-black text-sm text-black">Acceso Administrador</h3>
             <p className="text-[11px] text-gray-400 mb-4">Ingresa tu clave de dueño</p>
 
             <form onSubmit={handlePinSubmit} className="space-y-3">
@@ -796,7 +800,7 @@ export default function App() {
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 placeholder="****"
-                className="w-full text-center text-xl font-black p-2 border-2 border-gray-200 rounded-xl outline-none focus:border-black"
+                className="w-full text-center text-xl font-black p-2 border-2 border-black rounded-xl outline-none"
                 autoFocus
               />
 
