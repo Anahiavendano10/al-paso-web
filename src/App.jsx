@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Lock, LogOut, Search, ShoppingBag, Plus, Minus, X, 
+  Lock, LogOut, Search, ShoppingCart, Plus, Minus, X, 
   MapPin, Settings, Power, Menu, Instagram, Facebook, Info, Star, RefreshCw 
 } from 'lucide-react';
 import { supabase } from './supabase';
@@ -13,7 +13,12 @@ export default function App() {
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // Estado del local y servicios (Configurables desde Admin)
   const [isOpenLocal, setIsOpenLocal] = useState(true);
+  const [isDeliveryAvailable, setIsDeliveryAvailable] = useState(false); // Por defecto "No disponible"
+  const [isRetiroAvailable, setIsRetiroAvailable] = useState(true);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
@@ -28,7 +33,7 @@ export default function App() {
   // 🔴 DATOS DEL LOCAL
   // ==========================================
   const PHONE_NUMBER = "3884587924";
-  const DIRECCION_REAL = "Emilio Bottini 1703, Sargento Cabral, Jujuy";
+  const DIRECCION_REAL = "EMILIO BOTTINI 1703, SARGENTO CABRAL, JUJUY";
   const MAPS_LINK = "https://www.google.com/maps/place/%22Al+paso%22+empanaderia+y+sandwicheria/@-24.2266788,-65.2757969,19z";
   const IFRAME_SRC = "https://www.google.com/maps/embed?pb=%211m14%211m8%211m3%211d454.804006856018%212d-65.27579691485312%213d-24.226678810345796%213m2%211i1024%212i768%214f13.1%213m3%211m2%211s0x941b0757d2520663%3A0xaa1f3bf3ba4421f5%212s%22Al%20paso%22%20empanaderia%20y%20sandwicheria%215e0%213m2%211ses-419%212sus%214v1793575439458%215m2%211ses-419%212sus";
 
@@ -215,7 +220,7 @@ export default function App() {
             <span className={`w-3 h-3 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {isAdmin ? (
               <button
                 onClick={handleLogout}
@@ -235,14 +240,19 @@ export default function App() {
               </button>
             )}
 
-            {/* CARRITO PÍLDORA VERDE LIMA (COMO EN LA IMAGEN) */}
+            {/* NUEVO ÍCONO DE CARRITO DE SUPERMERCADO VISIBLE Y CLARO */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
-              className="text-black px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-black text-xs shadow-sm hover:opacity-95 transition-all"
+              className="text-black p-2.5 rounded-full flex items-center justify-center relative shadow-sm hover:opacity-95 transition-all active:scale-95"
+              title="Ver Carrito"
             >
-              <ShoppingBag size={16} className="fill-black stroke-black" />
-              <span>{cart.length}</span>
+              <ShoppingCart size={20} className="stroke-[2.5]" />
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-black text-white text-[10px] font-black w-4 h-4 rounded-full flex items-center justify-center border border-[#95c623]">
+                  {cart.length}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -251,7 +261,7 @@ export default function App() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
 
-        {/* TARJETA CON IMAGEN DE FONDO DETRÁS (SEGÚN LA IMAGEN DE REFERENCIA) */}
+        {/* TARJETA FLOTANTE DE LA PORTADA (ESTILO EXACTO DE LA IMAGEN) */}
         <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md max-w-md mx-auto">
           {/* Imagen de fondo detrás */}
           <div className="h-44 relative overflow-hidden">
@@ -262,51 +272,80 @@ export default function App() {
             />
           </div>
 
-          {/* Tarjeta flotante superpuesta */}
-          <div className="p-3 bg-transparent -mt-20 relative z-10">
-            <div className="bg-[#121212] rounded-[1.8rem] p-5 shadow-2xl text-white space-y-3 border border-white/10">
+          {/* Tarjeta clarita flotante superpuesta */}
+          <div className="p-3 bg-transparent -mt-24 relative z-10">
+            <div style={{ backgroundColor: '#E8Edd6' }} className="rounded-[1.8rem] p-5 shadow-2xl text-black space-y-3 border border-black/10">
+              
+              {/* AL PASO + SIGNO DE INFORMACIÓN (i) */}
               <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-black tracking-tight text-white uppercase">AL PASO</h2>
-                <span style={{ backgroundColor: '#95c623' }} className="text-black px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
-                  {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
-                </span>
+                <h2 className="text-3xl font-black tracking-tight text-black uppercase">AL PASO</h2>
+                <button
+                  onClick={() => setIsInfoModalOpen(true)}
+                  className="w-8 h-8 bg-black/10 rounded-full flex items-center justify-center text-black hover:bg-black/20 transition-all"
+                >
+                  <Info size={20} />
+                </button>
               </div>
 
-              <p className="text-xs font-extrabold text-gray-300 tracking-widest uppercase">
+              <p className="text-xs font-extrabold text-black/80 tracking-wide uppercase">
                 EMPANADERÍA Y SÁNDWICHERÍA
               </p>
 
-              <div className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
-                <MapPin size={16} style={{ color: '#95c623' }} className="shrink-0" />
+              <div className="flex items-center gap-1.5 text-xs text-black/80 font-bold uppercase">
+                <MapPin size={16} className="shrink-0 text-black" />
                 <span>{DIRECCION_REAL}</span>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <button
-                  style={{ backgroundColor: '#95c623' }}
-                  className="py-2.5 px-4 rounded-2xl text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm"
-                >
-                  🛵 Delivery
-                </button>
-                <button
-                  className="bg-[#1e1e1e] border border-white/10 py-2.5 px-4 rounded-2xl text-white font-extrabold text-xs flex items-center justify-center gap-2"
-                >
-                  🛍️ Retiro
-                </button>
+              {/* LÍNEA INFERIOR: ESTADO ABIERTO + RETIRO + DELIVERY */}
+              <div className="flex items-center justify-between pt-3 border-t border-black/10 flex-wrap gap-2">
+                
+                {/* Abierto / Cerrado */}
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${isOpenLocal ? 'bg-green-600' : 'bg-red-500'}`} />
+                  <span className="font-extrabold text-sm text-black">
+                    {isOpenLocal ? 'Abierto' : 'Cerrado'}
+                  </span>
+                </div>
+
+                {/* RETIRO PRIMERO Y DELIVERY DESPUÉS */}
+                <div className="flex items-center gap-1.5">
+                  {/* RETIRO */}
+                  <span 
+                    className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
+                      isRetiroAvailable 
+                        ? 'bg-black/10 text-black' 
+                        : 'bg-gray-300 text-gray-500 opacity-60'
+                    }`}
+                  >
+                    🛍️ Retiro {!isRetiroAvailable && <span className="text-[9px] font-normal">(No disp.)</span>}
+                  </span>
+
+                  {/* DELIVERY */}
+                  <span 
+                    className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${
+                      isDeliveryAvailable 
+                        ? 'bg-[#95c623] text-black' 
+                        : 'bg-black/10 text-gray-600 opacity-70'
+                    }`}
+                  >
+                    🛵 Delivery {!isDeliveryAvailable && <span className="text-[9px] font-normal">(No disp.)</span>}
+                  </span>
+                </div>
+
               </div>
             </div>
           </div>
         </div>
 
-        {/* MODO ADMINISTRADOR */}
+        {/* MODO ADMINISTRADOR (CON CONFIGURACIÓN DE DELIVERY Y RETIRO) */}
         {isAdmin && (
-          <div className="bg-white border-2 border-black rounded-2xl p-3.5 space-y-2 shadow-sm">
-            <div className="flex justify-between items-center">
+          <div className="bg-white border-2 border-black rounded-2xl p-4 space-y-3 shadow-sm">
+            <div className="flex justify-between items-center border-b pb-2">
               <div>
                 <span className="font-extrabold text-xs text-black flex items-center gap-1">
-                  <Settings size={14} /> Modo Administrador
+                  <Settings size={14} /> Panel de Administración
                 </span>
-                <p className="text-[10px] text-gray-600">Cambia horario o marca productos agotados</p>
+                <p className="text-[10px] text-gray-600">Configura el estado general de tu tienda</p>
               </div>
 
               <button
@@ -320,11 +359,36 @@ export default function App() {
               </button>
             </div>
 
+            {/* CONTROLES DE DELIVERY Y RETIRO DESDE ADMIN */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <button
+                onClick={() => setIsDeliveryAvailable(!isDeliveryAvailable)}
+                className={`py-2 px-3 rounded-xl text-xs font-extrabold border transition-all ${
+                  isDeliveryAvailable 
+                    ? 'bg-green-100 border-green-500 text-green-900' 
+                    : 'bg-red-50 border-red-300 text-red-700'
+                }`}
+              >
+                🛵 Delivery: {isDeliveryAvailable ? 'Disponible' : 'No disponible'}
+              </button>
+
+              <button
+                onClick={() => setIsRetiroAvailable(!isRetiroAvailable)}
+                className={`py-2 px-3 rounded-xl text-xs font-extrabold border transition-all ${
+                  isRetiroAvailable 
+                    ? 'bg-green-100 border-green-500 text-green-900' 
+                    : 'bg-red-50 border-red-300 text-red-700'
+                }`}
+              >
+                🛍️ Retiro: {isRetiroAvailable ? 'Disponible' : 'No disponible'}
+              </button>
+            </div>
+
             <button
               onClick={seedEmpanadasInSupabase}
-              className="w-full bg-black text-white py-1.5 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition-all hover:opacity-90"
+              className="w-full bg-black text-white py-2 rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition-all hover:opacity-90"
             >
-              <RefreshCw size={12} /> Cargar / Restablecer Sabores de Empanadas
+              <RefreshCw size={12} /> Restablecer Empanadas en Supabase
             </button>
           </div>
         )}
@@ -342,7 +406,7 @@ export default function App() {
             />
           </div>
 
-          {/* GRID DE CATEGORÍAS FIJAS */}
+          {/* GRID DE CATEGORÍAS */}
           <div className="grid grid-cols-3 gap-2 py-1">
             {categories.map((cat) => (
               <button
