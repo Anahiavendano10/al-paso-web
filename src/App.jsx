@@ -122,12 +122,11 @@ export default function App() {
     return matchesSearch && matchesCat;
   });
 
+  // CORREGIDO: SOLO ES DESTACADO SI ESTÁ EN TRUE EN LA BASE DE DATOS (O SI TIENE PRECIO ESPECIAL)
   const isSpecialEmpanada = (item) => {
     if (!item) return false;
     if (item.is_featured === true) return true;
-    if (item.category !== 'Empanadas') return false;
-    const nameLower = item.name.toLowerCase();
-    return nameLower.includes('champi') || nameLower.includes('matambre');
+    return false;
   };
 
   const openProductDetail = (prod) => {
@@ -180,14 +179,14 @@ export default function App() {
 
   const totalCartPrice = cart.reduce((acc, item) => acc + item.totalPrice, 0);
 
-  // ALTERNAR AGOTADO / DISPONIBLE EN SUPABASE
+  // ALTERNAR AGOTADO EN SUPABASE
   const toggleAvailable = async (id, currentStatus) => {
     const nextStatus = !currentStatus;
     setProducts(products.map(p => p.id === id ? { ...p, available: nextStatus } : p));
     
     const { error } = await supabase.from('products').update({ available: nextStatus }).eq('id', id);
     if (error) {
-      console.error("Error al actualizar estado disponible en Supabase:", error);
+      console.error("Error al actualizar disponible en Supabase:", error);
       fetchProducts();
     }
   };
@@ -499,7 +498,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* BOTONES MODO ADMIN: UNO AL LADO DEL OTRO (AGOTADO A LA IZQ, DESTACAR A LA DER) */}
+                  {/* BOTONES MODO ADMIN: UNO AL LADO DEL OTRO */}
                   {isAdmin && (
                     <div className="px-4 pb-4 border-t border-gray-100 pt-3 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
                       {/* 1° BOTÓN AGOTAR / ACTIVAR (ROJO A LA IZQUIERDA) */}
@@ -520,13 +519,13 @@ export default function App() {
                         type="button"
                         onClick={() => toggleFeatured(item.id, item.is_featured)}
                         className={`w-full py-2 px-2 rounded-full text-xs font-black flex items-center justify-center gap-1 transition-all shadow-xs ${
-                          item.is_featured 
-                            ? 'bg-amber-400 text-black border border-amber-500' 
-                            : 'bg-amber-100/70 text-amber-900 border border-amber-300 hover:bg-amber-200'
+                          item.is_featured === true 
+                            ? 'bg-amber-400 text-black border border-amber-500 font-extrabold' 
+                            : 'bg-amber-100/80 text-amber-900 border border-amber-300 hover:bg-amber-200'
                         }`}
                       >
-                        <Star size={12} className={item.is_featured ? 'fill-black' : ''} />
-                        {item.is_featured ? 'Destacado' : 'Destacar'}
+                        <Star size={12} className={item.is_featured === true ? 'fill-black' : ''} />
+                        {item.is_featured === true ? 'Destacado' : 'Destacar'}
                       </button>
                     </div>
                   )}
