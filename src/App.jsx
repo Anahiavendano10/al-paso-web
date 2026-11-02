@@ -216,13 +216,6 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsInfoModalOpen(true)}
-              className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center text-xs font-serif font-bold text-white hover:bg-white/20"
-            >
-              i
-            </button>
-
             {isAdmin ? (
               <button
                 onClick={handleLogout}
@@ -242,11 +235,11 @@ export default function App() {
               </button>
             )}
 
-            {/* BOTÓN CARRITO VERDE LIMA DE LA IMAGEN */}
+            {/* CARRITO PÍLDORA VERDE LIMA (COMO EN LA IMAGEN) */}
             <button
               onClick={() => setIsCartOpen(true)}
               style={{ backgroundColor: '#95c623' }}
-              className="text-black px-3 py-1.5 rounded-full flex items-center gap-1.5 font-black text-xs shadow-sm hover:opacity-95 transition-all"
+              className="text-black px-3.5 py-1.5 rounded-full flex items-center gap-1.5 font-black text-xs shadow-sm hover:opacity-95 transition-all"
             >
               <ShoppingBag size={16} className="fill-black stroke-black" />
               <span>{cart.length}</span>
@@ -258,36 +251,50 @@ export default function App() {
       {/* CONTENIDO PRINCIPAL */}
       <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
 
-        {/* TARJETA PRINCIPAL DEL LOCAL (ESTILO CAPTURA) */}
-        <div className="bg-[#121212] rounded-3xl p-5 shadow-xl text-white space-y-3">
-          <div className="flex justify-between items-center">
-            <h2 className="text-3xl font-black tracking-tight text-white uppercase">AL PASO</h2>
-            <span style={{ backgroundColor: '#95c623' }} className="text-black px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
-              {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
-            </span>
+        {/* TARJETA CON IMAGEN DE FONDO DETRÁS (SEGÚN LA IMAGEN DE REFERENCIA) */}
+        <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md max-w-md mx-auto">
+          {/* Imagen de fondo detrás */}
+          <div className="h-44 relative overflow-hidden">
+            <img
+              src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop"
+              alt="Portada AL PASO"
+              className="w-full h-full object-cover opacity-75"
+            />
           </div>
 
-          <p className="text-xs font-extrabold text-gray-300 tracking-widest uppercase">
-            EMPANADERÍA Y SÁNDWICHERÍA
-          </p>
+          {/* Tarjeta flotante superpuesta */}
+          <div className="p-3 bg-transparent -mt-20 relative z-10">
+            <div className="bg-[#121212] rounded-[1.8rem] p-5 shadow-2xl text-white space-y-3 border border-white/10">
+              <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-black tracking-tight text-white uppercase">AL PASO</h2>
+                <span style={{ backgroundColor: '#95c623' }} className="text-black px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+                  {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
+                </span>
+              </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
-            <MapPin size={16} style={{ color: '#95c623' }} className="shrink-0" />
-            <span>{DIRECCION_REAL}</span>
-          </div>
+              <p className="text-xs font-extrabold text-gray-300 tracking-widest uppercase">
+                EMPANADERÍA Y SÁNDWICHERÍA
+              </p>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
-            <button
-              style={{ backgroundColor: '#95c623' }}
-              className="py-2.5 px-4 rounded-2xl text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm"
-            >
-              🛵 Delivery
-            </button>
-            <button
-              className="bg-[#1e1e1e] border border-white/10 py-2.5 px-4 rounded-2xl text-white font-extrabold text-xs flex items-center justify-center gap-2"
-            >
-              🛍️ Retiro
-            </button>
+              <div className="flex items-center gap-1.5 text-xs text-gray-300 font-medium">
+                <MapPin size={16} style={{ color: '#95c623' }} className="shrink-0" />
+                <span>{DIRECCION_REAL}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  style={{ backgroundColor: '#95c623' }}
+                  className="py-2.5 px-4 rounded-2xl text-black font-extrabold text-xs flex items-center justify-center gap-2 shadow-sm"
+                >
+                  🛵 Delivery
+                </button>
+                <button
+                  className="bg-[#1e1e1e] border border-white/10 py-2.5 px-4 rounded-2xl text-white font-extrabold text-xs flex items-center justify-center gap-2"
+                >
+                  🛍️ Retiro
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -322,7 +329,7 @@ export default function App() {
           </div>
         )}
 
-        {/* BUSCADOR BLANCO CON BORDES REDONDEADOS (IGUAL A LA IMAGEN) */}
+        {/* BUSCADOR BLANCO */}
         <div className="space-y-3">
           <div className="bg-white rounded-2xl px-4 py-3 flex items-center gap-2 shadow-sm">
             <Search size={18} className="text-gray-400" />
@@ -335,7 +342,7 @@ export default function App() {
             />
           </div>
 
-          {/* GRID DE CATEGORÍAS (EN 2 FILAS FIJAS CON BOTONES BLANCOS Y NEGRO) */}
+          {/* GRID DE CATEGORÍAS FIJAS */}
           <div className="grid grid-cols-3 gap-2 py-1">
             {categories.map((cat) => (
               <button
@@ -353,7 +360,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* LISTA DE PRODUCTOS (TARJETAS BLANCAS COMO LA IMAGEN DE REFERENCIA) */}
+        {/* LISTA DE PRODUCTOS */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
           {loading ? (
             <p className="col-span-full text-center text-xs text-black font-bold py-8">Cargando menú...</p>
@@ -380,7 +387,6 @@ export default function App() {
                     item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'
                   }`}
                 >
-                  {/* IMAGEN DEL PRODUCTO (ALTA EN TARJETA) */}
                   <div className="h-44 w-full bg-gray-100 relative">
                     <img
                       src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
@@ -401,7 +407,6 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* INFORMACIÓN Y PRECIO */}
                   <div className="p-4 space-y-2">
                     <h3 className="font-extrabold text-base text-black">{item.name}</h3>
                     <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
@@ -424,7 +429,6 @@ export default function App() {
                         )}
                       </div>
 
-                      {/* BOTÓN "+ Agregar" EN VERDE LIMA COMO EN LA IMAGEN */}
                       <button
                         type="button"
                         style={{ backgroundColor: '#95c623' }}
@@ -455,7 +459,7 @@ export default function App() {
 
       </div>
 
-      {/* CARRITO FLOTANTE EN VERDE LIMA */}
+      {/* CARRITO FLOTANTE */}
       {cart.length > 0 && (
         <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-30">
           <button
@@ -576,7 +580,6 @@ export default function App() {
               <X size={18} />
             </button>
 
-            {/* Imagen del producto */}
             <div className="h-48 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
               <img
                 src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
@@ -585,7 +588,6 @@ export default function App() {
               />
             </div>
 
-            {/* Título, insignia y precio principal */}
             <div className="flex justify-between items-start gap-2 flex-wrap mb-1">
               <div className="flex-1 min-w-[200px]">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -610,7 +612,6 @@ export default function App() {
               )}
             </div>
 
-            {/* Selección de cantidad rápida (Empanadas) */}
             {selectedProduct.category === 'Empanadas' && (
               <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
                 <p className="text-xs font-bold text-black mb-2">Sumar cantidad rápida:</p>
@@ -657,7 +658,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Sándwiches y Hamburguesas - Notas */}
             {(selectedProduct.category === 'Sandwiches' || selectedProduct.category === 'Hamburguesas') && (
               <div className="mt-4 pt-3 border-t border-gray-100 animate-fade-in">
                 <label className="block text-xs font-bold text-black mb-1.5">
@@ -673,7 +673,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Selector de cantidad y Botón de añadir */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3 bg-gray-100 px-3 py-2 rounded-xl">
                 <button 
