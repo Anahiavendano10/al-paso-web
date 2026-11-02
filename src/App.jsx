@@ -107,9 +107,7 @@ export default function App() {
     setProductNotes('');
   };
 
-  // Cálculo: $1.500 cada unidad, aplica promo si alcanza 12 u. ($14.000 normales / $16.000 especiales)
-// Cálculo de promociones: 12 u. ($14.000 / $16.000), 6 u. ($7.000 / $8.000) y sueltas ($1.500)
-// Cálculo de promociones: 12 u. ($14.000 / $16.000), 6 u. ($7.000 / $8.000) y sueltas ($1.500)
+  // Cálculo: $1.500 cada unidad, aplica promo si alcanza docenas/medias docenas
   const calculateTotalPrice = (prod, qty) => {
     if (!prod) return 0;
     if (prod.category === 'Empanadas') {
@@ -127,7 +125,7 @@ export default function App() {
     }
     return Math.round(prod.price * qty);
   };
-  
+
   const addToCart = () => {
     if (!selectedProduct || productQuantity <= 0) return;
 
@@ -378,8 +376,9 @@ export default function App() {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
 
+                      {/* BADGE ESPECIAL ⭐ */}
                       {especial && (
-                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                        <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs animate-pulse">
                           <Star size={9} className="fill-amber-950" /> ESPECIAL
                         </span>
                       )}
@@ -562,7 +561,8 @@ export default function App() {
               <X size={18} />
             </button>
 
-            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4">
+            {/* Imagen del producto */}
+            <div className="h-44 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
               <img
                 src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
                 alt={selectedProduct.name}
@@ -570,46 +570,83 @@ export default function App() {
               />
             </div>
 
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-black">{selectedProduct.name}</h3>
-              {isSpecialEmpanada(selectedProduct) && (
-                <span className="bg-amber-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
-                  <Star size={10} className="fill-amber-950" /> ESPECIAL
-                </span>
+            {/* Título, insignia y precio principal al lado */}
+            <div className="flex justify-between items-start gap-2 flex-wrap mb-1">
+              <div className="flex-1 min-w-[200px]">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg font-black">{selectedProduct.name}</h3>
+                  {isSpecialEmpanada(selectedProduct) && (
+                    <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
+                      <Star size={9} className="fill-amber-950" /> ESPECIAL
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {selectedProduct.description || selectedProduct.category}
+                </p>
+              </div>
+
+              {/* Precio de la docena en el modal */}
+              {selectedProduct.category === 'Empanadas' && (
+                <div className="text-right shrink-0 pt-0.5">
+                  <span className="text-lg font-black text-gray-900 block">
+                    ${isSpecialEmpanada(selectedProduct) ? '16000' : '14000'} doc.
+                  </span>
+                </div>
               )}
             </div>
 
-            <p className="text-xs text-gray-500 mt-1">{selectedProduct.description || selectedProduct.category}</p>
-
+            {/* Selección de cantidad rápida */}
             {selectedProduct.category === 'Empanadas' && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <p className="text-xs font-bold text-gray-700 mb-2">Sumar cantidad rápida:</p>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setProductQuantity(productQuantity + 1)}
-                    className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
-                  >
-                    +1 Unidad
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProductQuantity(productQuantity + 6)}
-                    className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
-                  >
-                    +1/2 Docena
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setProductQuantity(productQuantity + 12)}
-                    className="py-2 px-3 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95"
-                  >
-                    +1 Docena
-                  </button>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  
+                  {/* +1 Unidad */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setProductQuantity(productQuantity + 1)}
+                      className="w-full py-2 px-1 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95 mb-1"
+                    >
+                      +1 Unidad
+                    </button>
+                    <span className="text-sm font-black text-gray-900">$1500</span>
+                  </div>
+
+                  {/* +1/2 Docena */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setProductQuantity(productQuantity + 6)}
+                      className="w-full py-2 px-1 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95 mb-1"
+                    >
+                      +1/2 Docena
+                    </button>
+                    <span className="text-sm font-black text-gray-900">
+                      ${isSpecialEmpanada(selectedProduct) ? '8000' : '7000'}
+                    </span>
+                  </div>
+
+                  {/* +1 Docena */}
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setProductQuantity(productQuantity + 12)}
+                      className="w-full py-2 px-1 bg-gray-50 hover:bg-emerald-50 border border-gray-200 hover:border-emerald-500 rounded-xl text-xs font-bold text-gray-800 hover:text-emerald-700 transition-all active:scale-95 mb-1"
+                    >
+                      +1 Docena
+                    </button>
+                    <span className="text-sm font-black text-gray-900">
+                      ${isSpecialEmpanada(selectedProduct) ? '16000' : '14000'}
+                    </span>
+                  </div>
+
                 </div>
               </div>
             )}
 
+            {/* Sándwiches - Agregar Notas */}
             {selectedProduct.category === 'Sandwiches' && (
               <div className="mt-4 pt-3 border-t border-gray-100">
                 <label className="block text-xs font-bold text-gray-700 mb-1.5">
@@ -625,6 +662,7 @@ export default function App() {
               </div>
             )}
 
+            {/* Parte inferior: Selector de cantidad y Botón de añadir */}
             <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
               <div className="flex items-center gap-3 bg-gray-100 px-3 py-1.5 rounded-xl">
                 <button 
