@@ -94,7 +94,6 @@ export default function App() {
     return matchesSearch && matchesCat;
   });
 
-  // Detección mejorada para Pollo al Champiñón y Matambre (con o sin tilde)
   const isSpecialEmpanada = (item) => {
     if (!item || item.category !== 'Empanadas') return false;
     const nameLower = item.name.toLowerCase();
@@ -108,20 +107,18 @@ export default function App() {
     setProductNotes('');
   };
 
+  // Cálculo: $1.500 cada unidad, aplica promo si alcanza 12 u. ($14.000 normales / $16.000 especiales)
   const calculateTotalPrice = (prod, qty) => {
     if (!prod) return 0;
     if (prod.category === 'Empanadas') {
       const isEspecial = isSpecialEmpanada(prod);
       const docenas = Math.floor(qty / 12);
-      const restoDocena = qty % 12;
-      const medias = Math.floor(restoDocena / 6);
-      const unidades = restoDocena % 6;
+      const unidadesRestantes = qty % 12;
 
       const precioDocena = isEspecial ? 16000 : 14000;
-      const precioMedia = isEspecial ? 8000 : 7000;
-      const precioUnidad = isEspecial ? 1500: 1500;
+      const precioUnidad = 1500;
 
-      return Math.round((docenas * precioDocena) + (medias * precioMedia) + (unidades * precioUnidad));
+      return (docenas * precioDocena) + (unidadesRestantes * precioUnidad);
     }
     return Math.round(prod.price * qty);
   };
@@ -376,7 +373,6 @@ export default function App() {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
 
-                      {/* BADGE ESPECIAL ⭐ */}
                       {especial && (
                         <span className="bg-amber-400 text-amber-950 text-[9px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 shadow-xs">
                           <Star size={9} className="fill-amber-950" /> ESPECIAL
@@ -392,7 +388,7 @@ export default function App() {
 
                     <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5">{item.description || item.category}</p>
                     
-                    {/* PRECIO DESTACADO EN GRANDE: DOCENA */}
+                    {/* PRECIOS EN LA TARJETA */}
                     <div className="flex items-center gap-2 mt-2">
                       {item.category === 'Empanadas' ? (
                         <>
@@ -400,7 +396,7 @@ export default function App() {
                             ${especial ? '16.000' : '14.000'} doc.
                           </span>
                           <span className="text-[10px] font-bold text-gray-400">
-                            (${Math.round(item.price)} u.)
+                            ($1.500 u.)
                           </span>
                         </>
                       ) : (
