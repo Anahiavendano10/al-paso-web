@@ -120,7 +120,7 @@ export default function App() {
 
   const getEmpanadaPrices = (prod) => {
     const isEspecial = isSpecialEmpanada(prod);
-    const pUnit = prod.price_unit !== undefined && prod.price_unit !== null ? prod.price_unit : (prod.price || 1500);
+    const pUnit = prod.price_unit !== undefined && prod.price_unit !== null ? prod.price_unit : 1500;
     const pHalf = prod.price_half !== undefined && prod.price_half !== null ? prod.price_half : (isEspecial ? 8000 : 7000);
     const pDozen = prod.price_dozen !== undefined && prod.price_dozen !== null ? prod.price_dozen : (isEspecial ? 16000 : 14000);
     return { pUnit, pHalf, pDozen };
@@ -213,7 +213,6 @@ export default function App() {
   };
 
   const handleOpenEmpanadaPriceModal = (prod, type, currentVal) => {
-    setSelectedProduct(null); // Cierra el modal de detalles para que no interfiera
     setEditingEmpanadaPrice({ product: prod, type });
     setNewEmpanadaPriceValue(currentVal);
   };
@@ -232,8 +231,13 @@ export default function App() {
     if (type === 'half') updateData = { price_half: parsedVal };
     if (type === 'dozen') updateData = { price_dozen: parsedVal };
 
+    // Actualización local inmediata
     setProducts(products.map(p => p.id === product.id ? { ...p, ...updateData } : p));
+    if (selectedProduct && selectedProduct.id === product.id) {
+      setSelectedProduct({ ...selectedProduct, ...updateData });
+    }
 
+    // Guardar en Supabase
     const { error } = await supabase
       .from('products')
       .update(updateData)
@@ -445,7 +449,6 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL PARA EDITAR PRECIO LIBRE DE EMPANADAS CON Z-[60] PARA ESTAR SIEMPRE AL FRENTE */}
       {editingEmpanadaPrice && (
         <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
           <div style={{ backgroundColor: '#E8Edd6' }} className="w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl border border-black/10">
