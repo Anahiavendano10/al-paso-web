@@ -213,6 +213,7 @@ export default function App() {
   };
 
   const handleOpenEmpanadaPriceModal = (prod, type, currentVal) => {
+    setSelectedProduct(null); // Cierra el modal de detalles para que no interfiera
     setEditingEmpanadaPrice({ product: prod, type });
     setNewEmpanadaPriceValue(currentVal);
   };
@@ -232,9 +233,6 @@ export default function App() {
     if (type === 'dozen') updateData = { price_dozen: parsedVal };
 
     setProducts(products.map(p => p.id === product.id ? { ...p, ...updateData } : p));
-    if (selectedProduct && selectedProduct.id === product.id) {
-      setSelectedProduct({ ...selectedProduct, ...updateData });
-    }
 
     const { error } = await supabase
       .from('products')
@@ -430,7 +428,7 @@ export default function App() {
       </div>
 
       {editingProduct && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
           <div style={{ backgroundColor: '#E8Edd6' }} className="w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl border border-black/10">
             <button onClick={() => setEditingProduct(null)} className="absolute top-4 right-4 text-gray-500 hover:text-black"><X size={18} /></button>
             <div style={{ backgroundColor: '#95c623' }} className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-black shadow-sm"><Pencil size={22} /></div>
@@ -447,8 +445,9 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL PARA EDITAR PRECIO LIBRE DE EMPANADAS CON Z-[60] PARA ESTAR SIEMPRE AL FRENTE */}
       {editingEmpanadaPrice && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/70 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
           <div style={{ backgroundColor: '#E8Edd6' }} className="w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl border border-black/10">
             <button onClick={() => setEditingEmpanadaPrice(null)} className="absolute top-4 right-4 text-gray-500 hover:text-black"><X size={18} /></button>
             <div style={{ backgroundColor: '#95c623' }} className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-black shadow-sm"><Pencil size={22} /></div>
@@ -461,7 +460,7 @@ export default function App() {
                 <span className="absolute left-4 top-3.5 font-black text-lg text-black">$</span>
                 <input type="number" step="1" value={newEmpanadaPriceValue} onChange={(e) => setNewEmpanadaPriceValue(e.target.value)} className="w-full text-center text-2xl font-black p-3 pl-8 bg-white border-2 border-black rounded-2xl outline-none text-black shadow-inner" autoFocus />
               </div>
-              <button type="submit" style={{ backgroundColor: '#121212' }} className="w-full text-[#95c623] py-3 rounded-2xl font-black text-xs shadow-md">Guardar Precio Libre</button>
+              <button type="submit" style={{ backgroundColor: '#121212' }} className="w-full text-[#95c623] py-3 rounded-2xl font-black text-xs shadow-md">Guardar Precio</button>
             </form>
           </div>
         </div>
