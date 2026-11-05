@@ -120,9 +120,9 @@ export default function App() {
 
   const getEmpanadaPrices = (prod) => {
     const isEspecial = isSpecialEmpanada(prod);
-    const pUnit = prod.price_unit !== undefined && prod.price_unit !== null ? prod.price_unit : 1500;
-    const pHalf = prod.price_half !== undefined && prod.price_half !== null ? prod.price_half : (isEspecial ? 8000 : 7000);
-    const pDozen = prod.price_dozen !== undefined && prod.price_dozen !== null ? prod.price_dozen : (isEspecial ? 16000 : 14000);
+    const pUnit = (prod.price_unit !== null && prod.price_unit !== undefined) ? Number(prod.price_unit) : (prod.price || 1500);
+    const pHalf = (prod.price_half !== null && prod.price_half !== undefined) ? Number(prod.price_half) : (isEspecial ? 8000 : 7000);
+    const pDozen = (prod.price_dozen !== null && prod.price_dozen !== undefined) ? Number(prod.price_dozen) : (isEspecial ? 16000 : 14000);
     return { pUnit, pHalf, pDozen };
   };
 
@@ -231,13 +231,6 @@ export default function App() {
     if (type === 'half') updateData = { price_half: parsedVal };
     if (type === 'dozen') updateData = { price_dozen: parsedVal };
 
-    // Actualización local inmediata
-    setProducts(products.map(p => p.id === product.id ? { ...p, ...updateData } : p));
-    if (selectedProduct && selectedProduct.id === product.id) {
-      setSelectedProduct({ ...selectedProduct, ...updateData });
-    }
-
-    // Guardar en Supabase
     const { error } = await supabase
       .from('products')
       .update(updateData)
@@ -245,7 +238,12 @@ export default function App() {
 
     if (error) {
       console.error("Error al actualizar precio libre de empanada en Supabase:", error);
-      fetchProducts();
+    } else {
+      await fetchProducts();
+      if (selectedProduct && selectedProduct.id === product.id) {
+        const updatedProd = { ...product, ...updateData };
+        setSelectedProduct(updatedProd);
+      }
     }
 
     setEditingEmpanadaPrice(null);
@@ -267,7 +265,7 @@ export default function App() {
     message += `\n\nQuedo a la espera de la confirmación. ¡Muchas gracias!`;
 
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/${PHONE_NUMBER.replace('+', '')}?text=${encodedMessage}`, '_blank');
   };
 
   return (
@@ -299,7 +297,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="max-w-md md:max-w-3xl mx-auto px-4 mt-3 space-y-4">
+      <div className="max-w-md md:max-w-3xl mx-auto px-3 mt-3 space-y-4">
         <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md w-full">
           <div className="h-44 relative overflow-hidden">
             <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop" alt="Portada" className="w-full h-full object-cover opacity-75" />
@@ -365,7 +363,8 @@ export default function App() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+        {/* LISTA DE PRODUCTOS EN DOS COLUMNAS */}
+        <div className="grid grid-cols-2 gap-3 pt-1">
           {loading ? (
             <p className="col-span-full text-center text-xs text-black font-bold py-8">Cargando menú...</p>
           ) : filteredProducts.length === 0 ? (
@@ -377,50 +376,52 @@ export default function App() {
               const especial = isSpecialEmpanada(item);
               const { pDozen } = getEmpanadaPrices(item);
               return (
-                <div key={item.id} onClick={() => openProductDetail(item)} className={`bg-white rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between ${item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'}`}>
-                  <div className="h-44 w-full bg-gray-100 relative">
+                <div key={item.id} onClick={() => openProductDetail(item)} className={`bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between ${item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'}`}>
+                  <div className="h-32 w-full bg-gray-100 relative">
                     <img src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'} alt={item.name} className="w-full h-full object-cover" />
                     {especial && (
-                      <span className="absolute top-3 left-3 bg-[#121212]/90 text-[#95c623] text-[9px] font-black px-2.5 py-1 rounded-full flex items-center gap-1 uppercase">
-                        <Star size={9} className="fill-[#95c623]" /> DESTACADO
+                      <span className="absolute top-2 left-2 bg-[#121212]/90 text-[#95c623] text-[8px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 uppercase">
+                        <Star size={8} className="fill-[#95c623]" /> DESTACADO
                       </span>
                     )}
                     {!item.available && (
-                      <span className="absolute top-3 right-3 bg-red-600 text-white text-[9px] font-black px-2 py-1 rounded-full uppercase">AGOTADO</span>
+                      <span className="absolute top-2 right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase">AGOTADO</span>
                     )}
                   </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="font-extrabold text-base text-black">{item.name}</h3>
-                    <p className="text-xs text-gray-500 line-clamp-2">{item.description || item.category}</p>
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="flex items-center gap-1.5">
+                  <div className="p-3 space-y-1.5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="font-extrabold text-xs text-black line-clamp-1">{item.name}</h3>
+                      <p className="text-[10px] text-gray-500 line-clamp-1">{item.description || item.category}</p>
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="flex items-center gap-1">
                         {item.category === 'Empanadas' ? (
                           <div>
-                            <span className="text-xl font-black text-black">${Math.round(pDozen)}</span>
-                            <span className="text-[10px] text-gray-400 font-bold ml-1">doc.</span>
+                            <span className="text-xs font-black text-black">${Math.round(pDozen)}</span>
+                            <span className="text-[9px] text-gray-400 font-bold">doc.</span>
                           </div>
                         ) : (
-                          <span className="text-xl font-black text-black">${Math.round(item.price || 0)}</span>
+                          <span className="text-xs font-black text-black">${Math.round(item.price || 0)}</span>
                         )}
                         {isAdmin && item.category !== 'Empanadas' && (
-                          <button type="button" onClick={(e) => { e.stopPropagation(); handleOpenPriceModal(item); }} className="p-1.5 bg-gray-100 hover:bg-black hover:text-[#95c623] text-gray-700 rounded-full" title="Editar precio">
-                            <Pencil size={12} />
+                          <button type="button" onClick={(e) => { e.stopPropagation(); handleOpenPriceModal(item); }} className="p-1 bg-gray-100 hover:bg-black hover:text-[#95c623] text-gray-700 rounded-full" title="Editar precio">
+                            <Pencil size={10} />
                           </button>
                         )}
                       </div>
-                      <button type="button" style={{ backgroundColor: '#95c623' }} className="text-black font-extrabold text-xs px-4 py-2 rounded-xl shadow-xs">
+                      <button type="button" style={{ backgroundColor: '#95c623' }} className="text-black font-extrabold text-[10px] px-2.5 py-1.5 rounded-xl shadow-xs">
                         + Agregar
                       </button>
                     </div>
                   </div>
                   {isAdmin && (
-                    <div className="px-4 pb-4 border-t border-gray-100 pt-3 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
-                      <button type="button" onClick={() => toggleAvailable(item.id, item.available)} className={`w-full py-2 px-2 rounded-full text-xs font-black text-white ${item.available ? 'bg-red-500' : 'bg-gray-800'}`}>
+                    <div className="px-3 pb-3 border-t border-gray-100 pt-2 grid grid-cols-2 gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      <button type="button" onClick={() => toggleAvailable(item.id, item.available)} className={`w-full py-1.5 px-1 rounded-full text-[10px] font-black text-white ${item.available ? 'bg-red-500' : 'bg-gray-800'}`}>
                         {item.available ? 'Agotar' : 'Activar'}
                       </button>
-                      <button type="button" onClick={() => toggleFeatured(item.id, item.is_featured)} className={`w-full py-2 px-2 rounded-full text-xs font-black flex items-center justify-center gap-1 ${item.is_featured === true ? 'bg-amber-400 text-black border border-amber-500' : 'bg-amber-100/80 text-amber-900 border border-amber-300'}`}>
-                        <Star size={12} className={item.is_featured === true ? 'fill-black' : ''} />
-                        {item.is_featured === true ? 'Destacado' : 'Destacar'}
+                      <button type="button" onClick={() => toggleFeatured(item.id, item.is_featured)} className={`w-full py-1.5 px-1 rounded-full text-[10px] font-black flex items-center justify-center gap-0.5 ${item.is_featured === true ? 'bg-amber-400 text-black border border-amber-500' : 'bg-amber-100/80 text-amber-900 border border-amber-300'}`}>
+                        <Star size={10} className={item.is_featured === true ? 'fill-black' : ''} />
+                        {item.is_featured === true ? 'Dest.' : 'Destacar'}
                       </button>
                     </div>
                   )}
@@ -638,7 +639,7 @@ export default function App() {
                       {item.notes && <p className="text-[10px] text-gray-600 italic">Notas: {item.notes}</p>}
                       <p className="text-[10px] text-gray-500 font-bold">${item.totalPrice}</p>
                     </div>
-                    <button onClick={() => removeFromCart(item.cartId)} className="text-red-500 p-1"><X size={16} /></button>
+                    <button onClick={() => removeFromCard(item.cartId)} className="text-red-500 p-1"><X size={16} /></button>
                   </div>
                 ))}
               </div>
