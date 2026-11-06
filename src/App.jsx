@@ -50,13 +50,13 @@ export default function App() {
   }, []);
 
   const fetchProducts = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.from('products').select('*').order('id', { ascending: true });
-    if (!error && data) {
-      setProducts(data);
-    }
-    setLoading(false);
-  };
+  setLoading(true);
+  const { data, error } = await supabase.from('products').select('*').order('order_index', { ascending: true });
+  if (!error && data) {
+    setProducts(data);
+  }
+  setLoading(false);
+};
 
   const handlePinSubmit = (e) => {
     e.preventDefault();
