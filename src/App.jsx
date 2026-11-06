@@ -88,22 +88,19 @@ export default function App() {
   const filteredProducts = products.filter(p => {
     const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
     
-    const baseSelectedCat = selectedCategory.split(' ')[0].toLowerCase()
-      .replace('sándwiches', 'sandwiches') 
-      .replace('promos', 'promos')
-      .replace('hamburguesas', 'hamburguesas')
-      .replace('empanadas', 'empanadas')
-      .replace('bebidas', 'bebidas');
+    if (selectedCategory === 'Todos') return matchesSearch;
 
-    const baseProductCat = (p.category || '').toLowerCase()
-      .replace('sándwiches', 'sandwiches')
-      .replace('sandwiches', 'sandwiches');
+    const catNormalized = (p.category || '').toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quita tildes ej: sándwiches -> sandwiches
+    
+    const selectedNormalized = selectedCategory.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
-    const matchesCat = selectedCategory === 'Todos' || baseProductCat === baseSelectedCat;
+    const matchesCat = catNormalized.includes(selectedNormalized.split(' ')[0]);
     
     return matchesSearch && matchesCat;
   });
-
+  
   const isSpecialEmpanada = (item) => {
     if (!item) return false;
     return item.is_featured === true;
