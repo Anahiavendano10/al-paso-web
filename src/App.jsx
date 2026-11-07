@@ -4,12 +4,16 @@ import {
   MapPin, Settings, Power, Menu, Instagram, Facebook, Star, RefreshCw, Pencil 
 } from 'lucide-react';
 import { supabase } from './supabase';
+import CartDrawer from './components/CartDrawer';
+const ADMIN_UID = 'e2452754-e0dc-4f72-89d5-b686322f2f83';
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
-  const [pin, setPin] = useState('');
-  const [pinError, setPinError] = useState('');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +31,14 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem('alpaso_cart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -42,39 +53,164 @@ export default function App() {
   const INSTAGRAM_LINK = "https://www.instagram.com/tu_perfil_alpaso";
   const FACEBOOK_LINK = "https://www.facebook.com/tu_pagina_alpaso";
 
+
   useEffect(() => {
     fetchProducts();
-    if (localStorage.getItem('alpaso_admin_active') === 'true') {
-      setIsAdmin(true);
-    }
+    fetchBusinessSettings();
+
+    const checkAdminSession = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (!error) {
+        setIsAdmin(user?.id === ADMIN_UID);
+      }
+    };
+
+    checkAdminSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setIsAdmin(session?.user?.id === ADMIN_UID);
+      }
+    );
+
+    const businessSettingsChannel = supabase
+      .channel('business-settings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'business_settings',
+          filter: 'id=eq.1'
+        },
+        (payload) => {
+          const updated = payload.new;
+
+          setIsOpenLocal(updated.is_open);
+          setIsDeliveryAvailable(updated.delivery_available);
+          setIsRetiroAvailable(updated.pickup_available);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+      supabase.removeChannel(businessSettingsChannel);
+    };
   }, []);
 
-  const fetchProducts = async () => {
-  setLoading(true);
-  const { data, error } = await supabase.from('products').select('*').order('order_index', { ascending: true });
-  if (!error && data) {
-    setProducts(data);
-  }
-  setLoading(false);
-};
 
-  const handlePinSubmit = (e) => {
-    e.preventDefault();
-    if (pin === '2026') {
-      setIsAdmin(true);
-      localStorage.setItem('alpaso_admin_active', 'true');
-      setIsPinModalOpen(false);
-      setPin('');
-      setPinError('');
-    } else {
-      setPinError('PIN Incorrecto');
+  useEffect(() => {
+    localStorage.setItem('alpaso_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  const fetchProducts = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('products').select('*');
+    if (!error && data) {
+      setProducts(data);
+    }
+    setLoading(false);
+  };
+
+
+  const fetchBusinessSettings = async () => {
+    const { data, error } = await supabase
+      .from('business_settings')
+      .select('*')
+      .eq('id', 1)
+      .single();
+
+    if (error) {
+      console.error('Error al cargar configuración:', error);
+      return;
+    }
+
+    setIsOpenLocal(data.is_open);
+    setIsDeliveryAvailable(data.delivery_available);
+    setIsRetiroAvailable(data.pickup_available);
+  };
+
+  const saveBusinessSetting = async (field, value) => {
+    if (!isAdmin) return;
+
+    const { data, error } = await supabase
+      .from('business_settings')
+      .update({
+        [field]: value,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', 1)
+      .select('id')
+      .maybeSingle();
+
+    if (error || !data) {
+      console.error('Error al guardar configuración:', error);
+      alert('No se pudo guardar el cambio. Intentá nuevamente.');
+      await fetchBusinessSettings();
+      return;
+    }
+
+    if (field === 'is_open') {
+      setIsOpenLocal(value);
+    }
+
+    if (field === 'delivery_available') {
+      setIsDeliveryAvailable(value);
+    }
+
+    if (field === 'pickup_available') {
+      setIsRetiroAvailable(value);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('alpaso_admin_active');
-    setIsAdmin(false);
+
+  const handlePinSubmit = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoginLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: adminEmail.trim(),
+        password: adminPassword,
+      });
+
+      if (error) {
+        setLoginError('Correo o contraseña incorrectos');
+        return;
+      }
+
+      if (data.user?.id !== ADMIN_UID) {
+        await supabase.auth.signOut();
+        setLoginError('Esta cuenta no tiene permisos de administrador');
+        return;
+      }
+
+      setAdminPassword('');
+      setIsPinModalOpen(false);
+    } catch {
+      setLoginError('No se pudo iniciar sesión. Intentá nuevamente.');
+    } finally {
+      setLoginLoading(false);
+    }
   };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error('Error al cerrar sesión:', error);
+      return;
+    }
+
+    setIsAdmin(false);
+    setAdminEmail('');
+    setAdminPassword('');
+    setLoginError('');
+  };
+
 
   const categories = [
     'Todos', 
@@ -331,15 +467,15 @@ export default function App() {
                 <span className="font-extrabold text-xs text-black flex items-center gap-1"><Settings size={14} /> Panel de Administración</span>
                 <p className="text-[10px] text-gray-600">Configura el estado de atención</p>
               </div>
-              <button onClick={() => setIsOpenLocal(!isOpenLocal)} className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${isOpenLocal ? 'bg-black text-white' : 'bg-red-600 text-white'}`}>
+              <button onClick={() => saveBusinessSetting('is_open', !isOpenLocal)} className={`px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1 ${isOpenLocal ? 'bg-black text-white' : 'bg-red-600 text-white'}`}>
                 <Power size={12} /> {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <button onClick={() => setIsRetiroAvailable(!isRetiroAvailable)} className={`py-2 px-3 rounded-xl text-xs font-extrabold border ${isRetiroAvailable ? 'bg-green-100 border-green-500 text-green-900' : 'bg-red-50 border-red-300 text-red-700'}`}>
+              <button onClick={() => saveBusinessSetting('pickup_available', !isRetiroAvailable)} className={`py-2 px-3 rounded-xl text-xs font-extrabold border ${isRetiroAvailable ? 'bg-green-100 border-green-500 text-green-900' : 'bg-red-50 border-red-300 text-red-700'}`}>
                 🛍️ Retiro: {isRetiroAvailable ? 'Disponible' : 'No'}
               </button>
-              <button onClick={() => setIsDeliveryAvailable(!isDeliveryAvailable)} className={`py-2 px-3 rounded-xl text-xs font-extrabold border ${isDeliveryAvailable ? 'bg-green-100 border-green-500 text-green-900' : 'bg-red-50 border-red-300 text-red-700'}`}>
+              <button onClick={() => saveBusinessSetting('delivery_available', !isDeliveryAvailable)} className={`py-2 px-3 rounded-xl text-xs font-extrabold border ${isDeliveryAvailable ? 'bg-green-100 border-green-500 text-green-900' : 'bg-red-50 border-red-300 text-red-700'}`}>
                 🛵 Delivery: {isDeliveryAvailable ? 'Disponible' : 'No'}
               </button>
             </div>
@@ -618,51 +754,82 @@ export default function App() {
         );
       })()}
 
-      {isCartOpen && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
-          <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
-            <div className="flex justify-between items-center pb-3 border-b">
-              <h3 className="font-black text-base text-black">Tu Pedido</h3>
-              <button onClick={() => setIsCartOpen(false)} className="p-1 text-gray-400"><X size={20} /></button>
-            </div>
-            {cart.length === 0 ? (
-              <p className="text-center text-xs text-gray-400 py-8">Tu carrito está vacío</p>
-            ) : (
-              <div className="divide-y divide-gray-100 my-4">
-                {cart.map((item) => (
-                  <div key={item.cartId} className="py-3 flex justify-between items-center">
-                    <div>
-                      <p className="font-extrabold text-xs text-black">{item.name} (x{item.quantity})</p>
-                      {item.notes && <p className="text-[10px] text-gray-600 italic">Notas: {item.notes}</p>}
-                      <p className="text-[10px] text-gray-500 font-bold">${item.totalPrice}</p>
-                    </div>
-                    <button onClick={() => removeFromCard(item.cartId)} className="text-red-500 p-1"><X size={16} /></button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="pt-3 border-t flex justify-between items-center font-black text-sm mb-4 text-black">
-              <span>Total</span>
-              <span>${totalCartPrice}</span>
-            </div>
-            <button onClick={handleSendWhatsApp} style={{ backgroundColor: '#95c623' }} className="w-full text-black py-3 rounded-2xl font-black text-xs shadow-md">
-              Continuar con el pedido en WhatsApp
-            </button>
-          </div>
-        </div>
-      )}
+      <CartDrawer
+        cart={cart}
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        onRemove={removeFromCart}
+        onCheckout={handleSendWhatsApp}
+        totalPrice={totalCartPrice}
+      />
+
 
       {isPinModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div style={{ backgroundColor: '#E8Edd6' }} className="w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl border border-black/10">
-            <button onClick={() => { setIsPinModalOpen(false); setPinError(''); setPin(''); }} className="absolute top-4 right-4 text-gray-500"><X size={18} /></button>
-            <div style={{ backgroundColor: '#95c623' }} className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-black shadow-sm"><Lock size={22} /></div>
-            <h3 className="font-black text-base text-black">Acceso Administrador</h3>
-            <p className="text-xs text-gray-600 mb-4">Ingresa tu clave de dueño</p>
+          <div
+            style={{ backgroundColor: '#E8Edd6' }}
+            className="w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl border border-black/10"
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setIsPinModalOpen(false);
+                setLoginError('');
+                setAdminPassword('');
+              }}
+              className="absolute top-4 right-4 text-gray-500"
+            >
+              <X size={18} />
+            </button>
+
+            <div
+              style={{ backgroundColor: '#95c623' }}
+              className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 text-black"
+            >
+              <Lock size={22} />
+            </div>
+
+            <h3 className="font-black text-base text-black">
+              Acceso Administrador
+            </h3>
+
+            <p className="text-xs text-gray-600 mb-4">
+              Ingresá con tu cuenta de AL PASO
+            </p>
+
             <form onSubmit={handlePinSubmit} className="space-y-3">
-              <input type="password" inputMode="numeric" pattern="[0-9]*" maxLength={4} value={pin} onChange={(e) => setPin(e.target.value)} placeholder="****" className="w-full text-center text-2xl font-black p-3 bg-white border-2 border-black rounded-2xl outline-none text-black tracking-widest shadow-inner" autoFocus />
-              {pinError && <p className="text-xs text-red-600 font-bold">{pinError}</p>}
-              <button type="submit" style={{ backgroundColor: '#121212' }} className="w-full text-[#95c623] py-3 rounded-2xl font-black text-xs shadow-md">Ingresar</button>
+              <input
+                type="email"
+                placeholder="Correo electrónico"
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                required
+                className="w-full p-3 bg-white border-2 border-black rounded-2xl text-sm text-black outline-none"
+              />
+
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                required
+                className="w-full p-3 bg-white border-2 border-black rounded-2xl text-sm text-black outline-none"
+              />
+
+              {loginError && (
+                <p className="text-xs text-red-600 font-bold">
+                  {loginError}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={loginLoading}
+                style={{ backgroundColor: '#121212' }}
+                className="w-full text-[#95c623] py-3 rounded-2xl font-black text-xs disabled:opacity-50"
+              >
+                {loginLoading ? 'Ingresando...' : 'Ingresar'}
+              </button>
             </form>
           </div>
         </div>
