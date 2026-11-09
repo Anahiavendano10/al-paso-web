@@ -17,6 +17,7 @@ export default function App() {
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   
   const [editingProduct, setEditingProduct] = useState(null);
   const [newPrice, setNewPrice] = useState('');
@@ -222,6 +223,7 @@ export default function App() {
   ];
   
   const filteredProducts = products.filter(p => {
+    if (!isAdmin && p.visible === false) return false;
     const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
     
     if (selectedCategory === 'Todos') return matchesSearch;
@@ -243,7 +245,7 @@ export default function App() {
   };
 
   const openProductDetail = (prod) => {
-    if (!prod.available) return;
+    if (!prod.available || prod.visible === false) return;
     setSelectedProduct(prod);
     
     const qtyInicial = (prod.category === 'Empanadas' || prod.category === 'Promos') ? 0 : 1;
@@ -274,7 +276,7 @@ export default function App() {
   };
 
   const addToCart = () => {
-    if (!selectedProduct || productQuantity <= 0) return;
+    if (!selectedProduct || !selectedProduct.available || selectedProduct.visible === false || productQuantity <= 0) return;
 
     const computedTotal = calculateTotalPrice(selectedProduct, productQuantity);
 
@@ -305,6 +307,21 @@ export default function App() {
       console.error("Error al actualizar disponible en Supabase:", error);
       fetchProducts();
     }
+  };
+
+  const toggleVisible = async (id, currentVisible) => {
+    if (!isAdmin) return;
+    const nextVisible = currentVisible === false;
+    const { data, error } = await supabase.from('products')
+      .update({ visible: nextVisible }).eq('id', id).select('id').maybeSingle();
+    if (error || !data) {
+      console.error('Error al actualizar visibilidad:', error);
+      alert('No se pudo guardar la visibilidad. Intentá nuevamente.');
+      await fetchProducts();
+      return;
+    }
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, visible: nextVisible } : p));
+    if (!nextVisible && selectedProduct?.id === id) setSelectedProduct(null);
   };
 
   const toggleFeatured = async (id, currentFeatured) => {
@@ -382,23 +399,39 @@ export default function App() {
     setEditingEmpanadaPrice(null);
   };
 
-  const handleSendWhatsApp = () => {
-    if (cart.length === 0) return;
-
-    let message = `*¡Hola AL PASO! Quiero realizar el siguiente pedido:*\n\n`;
-
-    cart.forEach((item) => {
-      message += `• *${item.name}* (x${item.quantity}) - $${item.totalPrice}\n`;
-      if (item.notes) {
-        message += `   _Detalle: ${item.notes}_\n`;
+  const handleSendWhatsApp = async () => {
+    if (cart.length === 0 || checkoutLoading) return;
+    setCheckoutLoading(true);
+    try {
+      // Consultar el estado actual, incluso si el carrito fue guardado días atrás.
+      const { data, error } = await supabase.from('products')
+        .select('id, name, available, visible')
+        .in('id', [...new Set(cart.map(item => item.id))]);
+      if (error || !data) {
+        alert('No pudimos verificar los productos. Intentá nuevamente.');
+        return;
       }
-    });
-
-    message += `\n*Total a pagar: $${totalCartPrice}*`;
-    message += `\n\nQuedo a la espera de la confirmación. ¡Muchas gracias!`;
-
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${PHONE_NUMBER.replace('+', '')}?text=${encodedMessage}`, '_blank');
+      const byId = new Map(data.map(p => [String(p.id), p]));
+      const unavailable = cart.filter(item => {
+        const current = byId.get(String(item.id));
+        return !current || current.available !== true || current.visible === false;
+      });
+      if (unavailable.length) {
+        alert('Estos productos ya no están disponibles: ' + unavailable.map(p => p.name).join(', ') + '. Quitalos del carrito para continuar.');
+        await fetchProducts();
+        return;
+      }
+      let message = `*¡Hola AL PASO! Quiero realizar el siguiente pedido:*\n\n`;
+      cart.forEach(item => {
+        message += `• *${item.name}* (x${item.quantity}) - $${item.totalPrice}\n`;
+        if (item.notes) message += `   _Detalle: ${item.notes}_\n`;
+      });
+      message += `\n*Total a pagar: $${totalCartPrice}*`;
+      message += `\n\nQuedo a la espera de la confirmación. ¡Muchas gracias!`;
+      window.open(`https://wa.me/${PHONE_NUMBER.replace('+', '')}?text=${encodeURIComponent(message)}`, '_blank');
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   return (
@@ -509,13 +542,16 @@ export default function App() {
               const especial = isSpecialEmpanada(item);
               const { pDozen } = getEmpanadaPrices(item);
               return (
-                <div key={item.id} onClick={() => openProductDetail(item)} className={`bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between ${item.available ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'}`}>
+                <div key={item.id} onClick={() => openProductDetail(item)} className={`bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between ${item.available && item.visible !== false ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'}`}>
                   <div className="h-32 w-full bg-gray-100 relative">
                     <img src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'} alt={item.name} className="w-full h-full object-cover" />
                     {especial && (
                       <span className="absolute top-2 left-2 bg-[#121212]/90 text-[#95c623] text-[8px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 uppercase">
                         <Star size={8} className="fill-[#95c623]" /> DESTACADO
                       </span>
+                    )}
+                    {isAdmin && item.visible === false && (
+                      <span className="absolute bottom-2 right-2 bg-gray-900 text-white text-[8px] font-black px-2 py-1 rounded-full">OCULTO</span>
                     )}
                     {!item.available && (
                       <span className="absolute top-2 right-2 bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase">AGOTADO</span>
@@ -548,9 +584,12 @@ export default function App() {
                     </div>
                   </div>
                   {isAdmin && (
-                    <div className="px-3 pb-3 border-t border-gray-100 pt-2 grid grid-cols-2 gap-1.5" onClick={(e) => e.stopPropagation()}>
+                    <div className="px-3 pb-3 border-t border-gray-100 pt-2 grid grid-cols-3 gap-1.5" onClick={(e) => e.stopPropagation()}>
                       <button type="button" onClick={() => toggleAvailable(item.id, item.available)} className={`w-full py-1.5 px-1 rounded-full text-[10px] font-black text-white ${item.available ? 'bg-red-500' : 'bg-gray-800'}`}>
                         {item.available ? 'Agotar' : 'Activar'}
+                      </button>
+                      <button type="button" onClick={() => toggleVisible(item.id, item.visible)} className={`w-full py-1.5 px-1 rounded-full text-[10px] font-black ${item.visible === false ? 'bg-green-700 text-white' : 'bg-slate-700 text-white'}`}>
+                        {item.visible === false ? 'Mostrar' : 'Ocultar'}
                       </button>
                       <button type="button" onClick={() => toggleFeatured(item.id, item.is_featured)} className={`w-full py-1.5 px-1 rounded-full text-[10px] font-black flex items-center justify-center gap-0.5 ${item.is_featured === true ? 'bg-amber-400 text-black border border-amber-500' : 'bg-amber-100/80 text-amber-900 border border-amber-300'}`}>
                         <Star size={10} className={item.is_featured === true ? 'fill-black' : ''} />
