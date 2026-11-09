@@ -1,11 +1,64 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Lock, LogOut, Search, ShoppingCart, Plus, Minus, X, 
-  MapPin, Settings, Power, Menu, Instagram, Facebook, Star, RefreshCw, Pencil 
+import {
+  Lock, LogOut, Search, ShoppingCart, Plus, Minus, X,
+  MapPin, Settings, Power, Menu, Instagram, Facebook, Star, RefreshCw, Pencil
 } from 'lucide-react';
 import { supabase } from './supabase';
 import CartDrawer from './components/CartDrawer';
 const ADMIN_UID = 'e2452754-e0dc-4f72-89d5-b686322f2f83';
+
+// Calcula promociones combinando todas las empanadas del carrito.
+// Se elige automaticamente la combinacion de packs mas economica.
+const calculateEmpanadaComboTotal = (traditionalCount, specialCount) => {
+  const traditional = Math.max(0, Math.floor(traditionalCount));
+  const special = Math.max(0, Math.floor(specialCount));
+  const memo = new Map();
+  const packs = [12, 6, 3, 1];
+
+  const solve = (t, e) => {
+    if (t === 0 && e === 0) return 0;
+    const key = `${t}:${e}`;
+    if (memo.has(key)) return memo.get(key);
+    let best = Infinity;
+    // Primero se forman todas las docenas posibles, luego medias docenas,
+    // luego ternas y finalmente unidades sueltas.
+    const size = packs.find(pack => pack <= t + e);
+    {
+      const minSpecial = Math.max(0, size - t);
+      const maxSpecial = Math.min(size, e);
+      for (let specialsInPack = minSpecial; specialsInPack <= maxSpecial; specialsInPack++) {
+        const traditionalInPack = size - specialsInPack;
+        let packPrice;
+        if (size === 12) packPrice = specialsInPack === 0 ? 14000 : (specialsInPack <= 6 ? 15000 : 16000);
+        else if (size === 6) packPrice = specialsInPack === 0 ? 7000 : 8000;
+        else if (size === 3) packPrice = specialsInPack === 0 ? 3500 : 4000;
+        else packPrice = 1500;
+        best = Math.min(best, packPrice + solve(t - traditionalInPack, e - specialsInPack));
+      }
+    }
+    memo.set(key, best);
+    return best;
+  };
+  return solve(traditional, special);
+};
+
+const isEmpanada = (item) => item?.category === 'Empanadas';
+
+const calculateCartTotal = (items) => {
+  let traditional = 0;
+  let special = 0;
+  let otherTotal = 0;
+  for (const item of items) {
+    if (isEmpanada(item)) {
+      if (item.is_featured === true) special += Number(item.quantity) || 0;
+      else traditional += Number(item.quantity) || 0;
+    } else {
+      otherTotal += Number(item.totalPrice) || 0;
+    }
+  }
+  return otherTotal + calculateEmpanadaComboTotal(traditional, special);
+};
+
 
 export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -18,7 +71,7 @@ export default function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  
+
   const [editingProduct, setEditingProduct] = useState(null);
   const [newPrice, setNewPrice] = useState('');
 
@@ -214,31 +267,31 @@ export default function App() {
 
 
   const categories = [
-    'Todos', 
-    'Promos 🏷️', 
-    'Empanadas 🥟', 
-    'Sándwiches 🥪', 
-    'Hamburguesas 🍔', 
+    'Todos',
+    'Promos 🏷️',
+    'Empanadas 🥟',
+    'Sándwiches 🥪',
+    'Hamburguesas 🍔',
     'Bebidas 🥤'
   ];
-  
+
   const filteredProducts = products.filter(p => {
     if (!isAdmin && p.visible === false) return false;
     const matchesSearch = (p.name || '').toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     if (selectedCategory === 'Todos') return matchesSearch;
 
     const catNormalized = (p.category || '').toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quita tildes ej: sándwiches -> sandwiches
-    
+
     const selectedNormalized = selectedCategory.toLowerCase()
       .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     const matchesCat = catNormalized.includes(selectedNormalized.split(' ')[0]);
-    
+
     return matchesSearch && matchesCat;
   });
-  
+
   const isSpecialEmpanada = (item) => {
     if (!item) return false;
     return item.is_featured === true;
@@ -247,7 +300,7 @@ export default function App() {
   const openProductDetail = (prod) => {
     if (!prod.available || prod.visible === false) return;
     setSelectedProduct(prod);
-    
+
     const qtyInicial = (prod.category === 'Empanadas' || prod.category === 'Promos') ? 0 : 1;
     setProductQuantity(qtyInicial);
     setProductNotes('');
@@ -296,12 +349,20 @@ export default function App() {
     setCart(cart.filter(item => item.cartId !== cartId));
   };
 
-  const totalCartPrice = cart.reduce((acc, item) => acc + item.totalPrice, 0);
+  const totalCartPrice = calculateCartTotal(cart);
+  // El importe mostrado por cada sabor es su aporte incremental al pedido.
+  // De este modo el desglose y el total del carrito siempre coinciden.
+  const cartWithComboPrices = cart.map((item, index) => ({
+    ...item,
+    totalPrice: isEmpanada(item)
+      ? calculateCartTotal(cart.slice(0, index + 1)) - calculateCartTotal(cart.slice(0, index))
+      : item.totalPrice
+  }));
 
   const toggleAvailable = async (id, currentStatus) => {
     const nextStatus = !currentStatus;
     setProducts(products.map(p => p.id === id ? { ...p, available: nextStatus } : p));
-    
+
     const { error } = await supabase.from('products').update({ available: nextStatus }).eq('id', id);
     if (error) {
       console.error("Error al actualizar disponible en Supabase:", error);
@@ -423,9 +484,14 @@ export default function App() {
       }
       let message = `*¡Hola AL PASO! Quiero realizar el siguiente pedido:*\n\n`;
       cart.forEach(item => {
-        message += `• *${item.name}* (x${item.quantity}) - $${item.totalPrice}\n`;
+        message += `• *${item.name}* (x${item.quantity})\n`;
         if (item.notes) message += `   _Detalle: ${item.notes}_\n`;
       });
+      const empanadaQuantity = cart.filter(isEmpanada).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+      if (empanadaQuantity > 0) {
+        const empanadaTotal = calculateCartTotal(cart.filter(isEmpanada));
+        message += `\n*Empanadas (${empanadaQuantity}) con promociones combinadas: $${empanadaTotal}*\n`;
+      }
       message += `\n*Total a pagar: $${totalCartPrice}*`;
       message += `\n\nQuedo a la espera de la confirmación. ¡Muchas gracias!`;
       window.open(`https://wa.me/${PHONE_NUMBER.replace('+', '')}?text=${encodeURIComponent(message)}`, '_blank');
@@ -794,7 +860,7 @@ export default function App() {
       })()}
 
       <CartDrawer
-        cart={cart}
+        cart={cartWithComboPrices}
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         onRemove={removeFromCart}
