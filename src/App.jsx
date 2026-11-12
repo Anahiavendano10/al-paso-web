@@ -5,13 +5,23 @@ import {
 } from 'lucide-react';
 import { supabase } from './supabase';
 import CartDrawer from './components/CartDrawer';
+const ADEREZOS_CLASICOS = ['Mayonesa clásica', 'Ketchup', 'Savora'];
+const SALSAS_ESPECIALES = [
+  'Mayonesa de ajo', 'Mayonesa de apio', 'Ají', 'Criolla clásica',
+  'Criolla con ají', 'Criolla con palta', 'Escabeche de locoto',
+  'Escabeche de berenjena', 'Cebolla caramelizada', 'Cebolla morada',
+  'Chimichurri', 'Provenzal'
+];
+
+const permiteAderezos = (producto) => ['Sandwiches', 'Hamburguesas', 'Promos'].includes(producto?.category) || producto?.secondary_category === 'Promos';
+
 const ADMIN_UID = 'e2452754-e0dc-4f72-89d5-b686322f2f83';
 
 // Calcula promociones combinando todas las empanadas del carrito.
 // Se elige automaticamente la combinacion de packs mas economica.
 const calculateEmpanadaComboTotal = (traditionalCount, specialCount) => {
-  const traditional = Math.max(0, Math.floor(traditionalCount));
-  const special = Math.max(0, Math.floor(specialCount));
+  const traditional = Math.max(0, Math.floor(Number(traditionalCount) || 0));
+  const special = Math.max(0, Math.floor(Number(specialCount) || 0));
   const memo = new Map();
   const packs = [12, 6, 3, 1];
 
@@ -19,30 +29,36 @@ const calculateEmpanadaComboTotal = (traditionalCount, specialCount) => {
     if (t === 0 && e === 0) return 0;
     const key = `${t}:${e}`;
     if (memo.has(key)) return memo.get(key);
-    let best = Infinity;
-    // Primero se forman todas las docenas posibles, luego medias docenas,
-    // luego ternas y finalmente unidades sueltas.
+
+    // Se prioriza formar docenas, luego medias docenas, promociones de 3
+    // y finalmente unidades. La composición de cada pack respeta el grupo.
     const size = packs.find(pack => pack <= t + e);
-    {
-      const minSpecial = Math.max(0, size - t);
-      const maxSpecial = Math.min(size, e);
-      for (let specialsInPack = minSpecial; specialsInPack <= maxSpecial; specialsInPack++) {
-        const traditionalInPack = size - specialsInPack;
-        let packPrice;
-        if (size === 12) packPrice = specialsInPack === 0 ? 14000 : (specialsInPack <= 6 ? 15000 : 16000);
-        else if (size === 6) packPrice = specialsInPack === 0 ? 7000 : 8000;
-        else if (size === 3) packPrice = specialsInPack === 0 ? 3500 : 4000;
-        else packPrice = 1500;
-        best = Math.min(best, packPrice + solve(t - traditionalInPack, e - specialsInPack));
+    let best = Infinity;
+    const minSpecial = Math.max(0, size - t);
+    const maxSpecial = Math.min(size, e);
+
+    for (let specialsInPack = minSpecial; specialsInPack <= maxSpecial; specialsInPack++) {
+      const traditionalInPack = size - specialsInPack;
+      let packPrice = 1500;
+      if (size === 12) {
+        packPrice = specialsInPack === 0 ? 14000 : (specialsInPack <= 6 ? 15000 : 16000);
+      } else if (size === 6) {
+        packPrice = specialsInPack === 0 ? 7000 : 8000;
+      } else if (size === 3) {
+        packPrice = specialsInPack === 0 ? 3500 : 4000;
       }
+      best = Math.min(best, packPrice + solve(t - traditionalInPack, e - specialsInPack));
     }
+
     memo.set(key, best);
     return best;
   };
+
   return solve(traditional, special);
 };
 
 const isEmpanada = (item) => item?.category === 'Empanadas';
+const isSpecialEmpanada = (item) => item?.price_group === 'especial';
 
 const calculateCartTotal = (items) => {
   let traditional = 0;
@@ -50,7 +66,7 @@ const calculateCartTotal = (items) => {
   let otherTotal = 0;
   for (const item of items) {
     if (isEmpanada(item)) {
-      if (item.is_featured === true) special += Number(item.quantity) || 0;
+      if (isSpecialEmpanada(item)) special += Number(item.quantity) || 0;
       else traditional += Number(item.quantity) || 0;
     } else {
       otherTotal += Number(item.totalPrice) || 0;
@@ -98,6 +114,7 @@ export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [productQuantity, setProductQuantity] = useState(0);
   const [productNotes, setProductNotes] = useState('');
+  const [choripanAderezos, setChoripanAderezos] = useState([]);
 
   const PHONE_NUMBER = "+5493884718946";
   const DIRECCION_REAL = "Emilio Bottini 1703, Sargento Cabral, Jujuy";
@@ -281,21 +298,23 @@ export default function App() {
 
     if (selectedCategory === 'Todos') return matchesSearch;
 
-    const catNormalized = (p.category || '').toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, ""); // Quita tildes ej: sándwiches -> sandwiches
+    const normalizeCategory = (value) => (value || '').toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
 
-    const selectedNormalized = selectedCategory.toLowerCase()
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const selectedNormalized = normalizeCategory(selectedCategory).split(' ')[0];
+    const primaryCategory = normalizeCategory(p.category);
+    const secondaryCategories = String(p.secondary_category || '')
+      .split(',')
+      .map(normalizeCategory)
+      .filter(Boolean);
 
-    const matchesCat = catNormalized.includes(selectedNormalized.split(' ')[0]);
+    // Un producto puede aparecer en su categoría principal y también en Promos,
+    // sin crear un segundo registro ni duplicarlo en el carrito.
+    const matchesCat = primaryCategory.includes(selectedNormalized) ||
+      secondaryCategories.some(category => category.includes(selectedNormalized));
 
     return matchesSearch && matchesCat;
   });
-
-  const isSpecialEmpanada = (item) => {
-    if (!item) return false;
-    return item.is_featured === true;
-  };
 
   const openProductDetail = (prod) => {
     if (!prod.available || prod.visible === false) return;
@@ -304,26 +323,21 @@ export default function App() {
     const qtyInicial = (prod.category === 'Empanadas' || prod.category === 'Promos') ? 0 : 1;
     setProductQuantity(qtyInicial);
     setProductNotes('');
+    setChoripanAderezos([]);
   };
 
   const getEmpanadaPrices = (prod) => {
     const isEspecial = isSpecialEmpanada(prod);
-    const pUnit = (prod.price_unit !== null && prod.price_unit !== undefined) ? Number(prod.price_unit) : (prod.price || 1500);
-    const pHalf = (prod.price_half !== null && prod.price_half !== undefined) ? Number(prod.price_half) : (isEspecial ? 8000 : 7000);
-    const pDozen = (prod.price_dozen !== null && prod.price_dozen !== undefined) ? Number(prod.price_dozen) : (isEspecial ? 16000 : 14000);
+    const pUnit = prod?.price_unit != null ? Number(prod.price_unit) : 1500;
+    const pHalf = prod?.price_half != null ? Number(prod.price_half) : (isEspecial ? 8000 : 7000);
+    const pDozen = prod?.price_dozen != null ? Number(prod.price_dozen) : (isEspecial ? 16000 : 14000);
     return { pUnit, pHalf, pDozen };
   };
 
   const calculateTotalPrice = (prod, qty) => {
-    if (!prod) return 0;
-    if (prod.category === 'Empanadas') {
-      const { pUnit, pHalf, pDozen } = getEmpanadaPrices(prod);
-      const docenas = Math.floor(qty / 12);
-      const restoDocena = qty % 12;
-      const medias = Math.floor(restoDocena / 6);
-      const unidadesSueltas = restoDocena % 6;
-
-      return (docenas * pDozen) + (medias * pHalf) + (unidadesSueltas * pUnit);
+    if (!prod || qty <= 0) return 0;
+    if (isEmpanada(prod)) {
+      return calculateEmpanadaComboTotal(isSpecialEmpanada(prod) ? 0 : qty, isSpecialEmpanada(prod) ? qty : 0);
     }
     return Math.round((prod.price || 0) * qty);
   };
@@ -333,11 +347,16 @@ export default function App() {
 
     const computedTotal = calculateTotalPrice(selectedProduct, productQuantity);
 
+    const aderezosDetalle = permiteAderezos(selectedProduct) && choripanAderezos.length
+      ? `Aderezos: ${choripanAderezos.join(', ')}`
+      : '';
+    const notasFinales = [aderezosDetalle, productNotes.trim()].filter(Boolean).join(' | ');
+
     const itemToAdd = {
       ...selectedProduct,
       cartId: Date.now(),
       quantity: productQuantity,
-      notes: (selectedProduct.category === 'Sandwiches' || selectedProduct.category === 'Hamburguesas') ? productNotes : '',
+      notes: permiteAderezos(selectedProduct) ? notasFinales : '',
       totalPrice: computedTotal
     };
 
@@ -508,7 +527,7 @@ export default function App() {
             <Menu size={22} />
           </button>
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setIsInfoModalOpen(true)}>
-            <h1 className="text-2xl font-black tracking-tight text-white uppercase">AL PASO</h1>
+            <img src="/al-paso-logo.png" alt="AL PASO" className="w-28 sm:w-36 h-10 object-contain" />
             <span className={`w-3 h-3 rounded-full ${isOpenLocal ? 'bg-[#95c623]' : 'bg-red-500'}`} />
           </div>
           <div className="flex items-center gap-2">
@@ -532,12 +551,12 @@ export default function App() {
       <div className="max-w-md md:max-w-3xl mx-auto px-3 mt-3 space-y-4">
         <div className="relative rounded-[2rem] overflow-hidden bg-black shadow-md w-full">
           <div className="h-44 relative overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=800&auto=format&fit=crop" alt="Portada" className="w-full h-full object-cover opacity-75" />
+            <img src="/fondo-al-paso.jpeg" alt="Portada" className="w-full h-full object-cover object-[center_35%] opacity-75" />
           </div>
           <div className="p-3 bg-transparent -mt-20 relative z-10">
             <div className="bg-[#121212] rounded-[1.8rem] p-5 shadow-2xl text-white space-y-3 border border-white/10">
               <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-black tracking-tight text-white uppercase">AL PASO</h2>
+                <img src="/al-paso-logo.png" alt="AL PASO" className="w-44 sm:w-60 h-16 object-contain object-left" />
                 <span style={{ backgroundColor: isOpenLocal ? '#95c623' : '#ef4444' }} className="text-black px-3 py-1 rounded-full text-xs font-black uppercase">
                   {isOpenLocal ? 'ABIERTO' : 'CERRADO'}
                 </span>
@@ -609,8 +628,8 @@ export default function App() {
               const { pDozen } = getEmpanadaPrices(item);
               return (
                 <div key={item.id} onClick={() => openProductDetail(item)} className={`bg-white rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between ${item.available && item.visible !== false ? 'cursor-pointer hover:shadow-md transition-all active:scale-[0.99]' : 'opacity-60'}`}>
-                  <div className="h-32 w-full bg-gray-100 relative">
-                    <img src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'} alt={item.name} className="w-full h-full object-cover" />
+                  <div className="h-44 w-full bg-gray-100 relative overflow-hidden">
+                    <img src={item.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'} alt={item.name} className="block w-full h-full object-cover" />
                     {especial && (
                       <span className="absolute top-2 left-2 bg-[#121212]/90 text-[#95c623] text-[8px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5 uppercase">
                         <Star size={8} className="fill-[#95c623]" /> DESTACADO
@@ -724,10 +743,8 @@ export default function App() {
         <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
           <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 max-h-[85vh] overflow-y-auto relative">
             <button onClick={() => setIsInfoModalOpen(false)} className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full text-black"><X size={18} /></button>
-            <div className="text-center space-y-2 mb-6">
-              <div className="w-16 h-16 bg-[#121212] text-[#95c623] rounded-2xl flex items-center justify-center mx-auto text-xl font-black shadow-md">AP</div>
-              <h2 className="text-2xl font-black text-gray-900">AL PASO</h2>
-              <p className="text-xs text-gray-500 uppercase">Empanadería y Sandwichería</p>
+            <div className="mb-6 flex items-center justify-center">
+              <img src="/logo-al-paso-circular.png" alt="AL PASO Food Truck" className="w-full max-w-[160px] h-auto object-contain" />
             </div>
             <div className="space-y-4 text-xs border-t border-gray-100 pt-4">
               <div>
@@ -773,8 +790,12 @@ export default function App() {
           <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
             <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto relative">
               <button onClick={() => setSelectedProduct(null)} className="absolute top-4 right-4 bg-gray-100 p-1.5 rounded-full text-black z-10"><X size={18} /></button>
-              <div className="h-48 bg-gray-100 rounded-2xl overflow-hidden mb-4 relative">
-                <img src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'} alt={selectedProduct.name} className="w-full h-full object-cover" />
+              <div className={`${selectedProduct.category === 'Bebidas' ? 'h-64' : 'h-48'} bg-gray-100 rounded-2xl overflow-hidden mb-4 relative`}>
+                <img
+                  src={selectedProduct.image || 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=600&auto=format&fit=crop'}
+                  alt={selectedProduct.name}
+                  className={`block w-full h-full ${selectedProduct.category === 'Bebidas' ? 'object-contain p-5' : 'object-cover'}`}
+                />
               </div>
               <div className="flex justify-between items-start gap-2 flex-wrap mb-1">
                 <div className="flex-1 min-w-[200px]">
@@ -836,10 +857,38 @@ export default function App() {
                 </div>
               )}
 
-              {(selectedProduct.category === 'Sandwiches' || selectedProduct.category === 'Hamburguesas') && (
+              {permiteAderezos(selectedProduct) && (
+                <div className="mt-4 pt-3 border-t border-gray-100 space-y-3">
+                  <div>
+                    <h4 className="text-sm font-black text-black">Elegí tus aderezos</h4>
+                    <p className="text-xs text-gray-500 mt-1">Marcá los clásicos que quieras y escribí las salsas especiales en observaciones.</p>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 border border-gray-100 p-3">
+                    <h5 className="text-xs font-black text-black uppercase mb-2">Aderezos clásicos</h5>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {ADEREZOS_CLASICOS.map((opcion) => (
+                        <label key={opcion} className={`flex items-center gap-2 p-2 rounded-xl cursor-pointer text-xs font-semibold border ${choripanAderezos.includes(opcion) ? 'border-[#95c623] bg-[#95c623]/15 text-black' : 'border-gray-200 bg-white text-gray-700'}`}>
+                          <input type="checkbox" className="accent-[#95c623] w-4 h-4 shrink-0"
+                            checked={choripanAderezos.includes(opcion)}
+                            onChange={(e) => setChoripanAderezos(prev => e.target.checked ? [...prev, opcion] : prev.filter(a => a !== opcion))}
+                          />
+                          {opcion}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-2xl bg-gray-50 border border-gray-100 p-3">
+                    <h5 className="text-xs font-black text-black uppercase mb-2">Salsas especiales disponibles</h5>
+                    <p className="text-xs text-gray-600 mb-2">Si querés alguna, escribí su nombre en el recuadro de abajo:</p>
+                    <p className="text-xs text-gray-700 leading-relaxed">{SALSAS_ESPECIALES.join(' · ')}</p>
+                  </div>
+                </div>
+              )}
+
+              {permiteAderezos(selectedProduct) && (
                 <div className="mt-4 pt-3 border-t border-gray-100">
                   <label className="block text-xs font-bold text-black mb-1.5">Aderezos y verduras adicionales:</label>
-                  <textarea rows="2" placeholder="Ej: Con mayo, sin cebolla..." value={productNotes} onChange={(e) => setProductNotes(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium outline-none text-black" />
+                  <textarea rows="2" placeholder="Ej: Criolla con ají, cebolla caramelizada, sin cebolla..." value={productNotes} onChange={(e) => setProductNotes(e.target.value)} className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs font-medium outline-none text-black" />
                 </div>
               )}
 
